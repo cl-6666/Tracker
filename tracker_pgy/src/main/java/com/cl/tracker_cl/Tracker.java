@@ -1,5 +1,6 @@
 package com.cl.tracker_cl;
 
+import android.Manifest;
 import android.app.Application;
 import android.content.Context;
 import android.os.Handler;
@@ -11,6 +12,7 @@ import android.view.View;
 import com.cl.tracker_cl.bean.CommonBean;
 import com.cl.tracker_cl.bean.ConfigBean;
 import com.cl.tracker_cl.bean.EventBean;
+import com.cl.tracker_cl.db.TrackData;
 import com.cl.tracker_cl.http.BaseBean;
 import com.cl.tracker_cl.http.BaseProtocolBean;
 import com.cl.tracker_cl.http.HttpManager;
@@ -18,6 +20,9 @@ import com.cl.tracker_cl.http.UPLOAD_CATEGORY;
 import com.cl.tracker_cl.http.UploadEventService;
 import com.cl.tracker_cl.util.LogUtil;
 import com.google.gson.reflect.TypeToken;
+
+import org.litepal.LitePal;
+import org.litepal.exceptions.DataSupportException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +45,7 @@ public class Tracker {
     private Context mContext;
     private TrackConfiguration config;
     private CommonBean commonInfo;
+    private TrackData mTrackData;
 
     private final int UPLOAD_EVENT_WHAT = 0xff01;
     private final int MAX_EVENT_COUNT = 50;
@@ -76,36 +82,6 @@ public class Tracker {
         //监听生命周期
 //        context.registerActivityLifecycleCallbacks(new ActivityLifecycleListener());
         commonInfo = new CommonBean(mContext);
-
-        switch (config.getUploadCategory()) {
-            case REAL_TIME:
-
-                break;
-
-            case NEXT_LAUNCH:
-
-                break;
-
-            case NEXT_15_MINUTER:
-
-                break;
-
-            case NEXT_30_MINUTER:
-
-                break;
-
-            case NEXT_KNOWN_MINUTER:
-
-                break;
-
-            default:
-
-                break;
-
-//            UploadEventService.enter(context, config.getHostName(), config.getHostPort(), null);
-
-        }
-
         LogUtil.e("公共参数：" + commonInfo.getParameters("sss"));
     }
 
@@ -178,6 +154,34 @@ public class Tracker {
 
     private void addEvent(final EventBean eventInfo) {
         LogUtil.i("EventBean:" + eventInfo.toString());
+        switch (config.getUploadCategory()) {
+            case REAL_TIME:
+
+                break;
+
+            case NEXT_LAUNCH:
+
+                break;
+
+            case NEXT_15_MINUTER:
+
+                break;
+
+            case NEXT_30_MINUTER:
+
+                break;
+
+            case NEXT_KNOWN_MINUTER:
+
+                break;
+
+            default:
+
+                break;
+
+//            UploadEventService.enter(context, config.getHostName(), config.getHostPort(), null);
+        }
+
         if (config.getUploadCategory() == UPLOAD_CATEGORY.REAL_TIME) {
             commitRealTimeEvent(eventInfo);
         } else {
@@ -265,6 +269,31 @@ public class Tracker {
 
     public static class Singleton {
         private final static Tracker instance = new Tracker();
+    }
+
+
+    /**
+     * 更新 GPS 位置信息
+     *
+     * @param latitude
+     * @param longitude
+     */
+    public void setGPSLocation(double latitude, double longitude) {
+        mTrackData = new TrackData();
+        mTrackData.setLatitude(String.valueOf(latitude));
+        mTrackData.setLongitude(String.valueOf(longitude));
+        mTrackData.save();
+
+    }
+
+
+    /**
+     * 标识用户登录的id
+     *
+     * @param logType
+     */
+    public void setLogType(String logType) {
+
     }
 
 

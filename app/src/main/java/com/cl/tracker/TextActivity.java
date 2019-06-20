@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+import com.cl.tracker_cl.Tracker;
 import com.cl.tracker_cl.listener.ViewClickedEventListener;
 
 public class TextActivity extends AppCompatActivity {
@@ -35,6 +36,7 @@ public class TextActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 ViewClickedEventListener.getInstance().setActivityTracker(TextActivity.this);
+
             }
         });
     }

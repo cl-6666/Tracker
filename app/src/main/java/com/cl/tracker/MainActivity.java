@@ -1,11 +1,16 @@
 package com.cl.tracker;
 
+import android.Manifest;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.cl.tracker_cl.Tracker;
+import com.cl.tracker_cl.permissions.PermissionListener;
+import com.cl.tracker_cl.permissions.PermissionsUtil;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -25,10 +30,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 TextActivity.enter(MainActivity.this, 1);
-                Tracker.getInstance().addViewEvent(MainActivity.this, null, 0L);
+                // Tracker.getInstance().setGPSLocation(2323.32,4232.32);   //测试经纬度
             }
         });
-    }
 
+
+    }
 
 }

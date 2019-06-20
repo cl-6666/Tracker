@@ -32,7 +32,8 @@
         </list>
     -->
     <list>
-        <mapping class="com.cl.tracker_cl.db.trackerDb"></mapping>
+        <mapping class="com.cl.tracker_cl.db.TrackerDb"></mapping>
+        <mapping class="com.cl.tracker_cl.db.TrackData"></mapping>
     </list>
 
     <!--
@@ -47,5 +48,5 @@
     -->
 
     <!-- 直接设置这个，就表示数据库存储的位置，直接打开手机存储就可以找到 -->
-    <storage value="guolin/database" />
+    <!--<storage value="guolin/database" />-->
 </litepal>

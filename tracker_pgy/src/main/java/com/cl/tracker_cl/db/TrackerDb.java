@@ -11,7 +11,7 @@ import org.litepal.crud.LitePalSupport;
  * 描述： 主键数据库会自动增加无需定义
  * 修订历史：
  */
-public class trackerDb extends LitePalSupport {
+public class TrackerDb extends LitePalSupport {
 
     private int type;
     private String userData;
