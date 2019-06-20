@@ -8,13 +8,13 @@ import org.litepal.crud.LitePalSupport;
  * 作者：Arry
  * 版本：1.0
  * 创建日期：2019-06-20
- * 描述：
+ * 描述： 主键数据库会自动增加无需定义
  * 修订历史：
  */
 public class trackerDb extends LitePalSupport {
 
     private int type;
-    private String eventsData;
+    private String userData;
     private String eventTime;
 
 
@@ -26,12 +26,12 @@ public class trackerDb extends LitePalSupport {
         this.type = type;
     }
 
-    public String getEventsData() {
-        return eventsData;
+    public String getUserData() {
+        return userData;
     }
 
-    public void setEventsData(String eventsData) {
-        this.eventsData = eventsData;
+    public void setUserData(String userData) {
+        this.userData = userData;
     }
 
     public String getEventTime() {

@@ -227,7 +227,7 @@ public class Tracker {
         if (data == null || data.length == 0) {
             return;
         }
-        HttpManager.getInstance(mContext).postQuery(config.getPgyServerUrl(), data, BaseProtocolBean.class,
+        HttpManager.getInstance(mContext).postQuery(config.getServerUrl(), data, BaseProtocolBean.class,
                 new HttpManager.OnRequestListener() {
                     @Override
                     public void onSuccess(Object result) {

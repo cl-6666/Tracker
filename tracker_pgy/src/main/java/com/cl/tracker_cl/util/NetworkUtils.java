@@ -9,8 +9,6 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.telephony.TelephonyManager;
 
-import com.cl.tracker_cl.Tracker;
-
 
 public class NetworkUtils {
 

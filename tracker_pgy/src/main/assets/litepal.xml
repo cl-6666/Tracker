@@ -8,7 +8,7 @@
         For example:
         <dbname value="demo" />
     -->
-    <dbname value="tracker" />
+    <dbname value="dataCache" />
 
     <!--
         Define the version of your database. Each time you want

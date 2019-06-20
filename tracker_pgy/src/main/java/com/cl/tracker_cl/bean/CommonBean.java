@@ -3,6 +3,7 @@ package com.cl.tracker_cl.bean;
 import android.content.Context;
 
 import com.cl.tracker_cl.util.AppUtil;
+import com.cl.tracker_cl.util.NetworkUtils;
 
 import java.io.Serializable;
 
@@ -13,40 +14,90 @@ import java.io.Serializable;
 public class CommonBean implements Serializable {
 
     /**
-     * 包名
+     * 设备ID（有权限时候直接获取，没有权限获取硬件码生成唯一id，使用uuid）
      */
-    private String packageName;
+    private String device_id;
     /**
-     * 渠道号
+     * 例如 WIFI、4G等
+     */
+    private String network_type;
+    /**
+     * wifi名称（没有的话为空串）
+     */
+    private String wifi_name;
+    /**
+     * 屏幕宽度 例如 1080
+     */
+    private String screen_width;
+    /**
+     * 屏幕高度 例如 2160
+     */
+    private String screen_height;
+    /**
+     * 操作系统，例如 ios、android
+     */
+    private String os;
+    /**
+     * 操作系统版本，例如 8.1.0
+     */
+    private String os_version;
+    /**
+     * 设备制造商，例如 Xiaomi
+     */
+    private String manufacturer;
+    /**
+     * 设备型号，例如 MI MAX 3
+     */
+    private String model;
+    /**
+     * 经度
+     */
+    private String longitude;
+    /**
+     * 纬度
+     */
+    private String latitude;
+
+    /**
+     * SDK类型，例如android，ios，java，javascript等
+     */
+    private String sdk;
+
+    /**
+     * SDK版本，例如3.1.5
+     */
+    private String sdk_version;
+
+    /**
+     * 应用的版本，1.3.0
+     */
+    private String app_version;
+
+    /**
+     * 应用的名称
+     */
+    private String app_name;
+
+    /**
+     * 渠道编码
      */
     private String channel;
+
     /**
-     * APP版本号
+     * 页面的标题（以Android为示例 首先读取 activity.getTitle()，如果使用 actionBar，
+     * 并且 actionBar.getTitle() 不为空，则actionBar.getTitle() 覆盖 activity.getTitle()，
+     * 如果以上两步都没有读到 title，则获取 activity 的 android:label 属性。若还是没有则为空串）
      */
-    private String version;
+    private String title;
+
     /**
-     * 位置信息，格式：经度_维度
+     * Activity 的包名.类名
      */
-    private String position;
-    /**
-     * 手机唯一识别码，为了避免用户不授权，使用自己生成的唯一码
-     */
-    private String deviceId;
-    /**
-     * 手机品牌
-     */
-    private String phoneBrand;
-    /**
-     * 手机系统版本
-     */
-    private String OSVersion;
-    /**
-     * SDK版本
-     */
-    private String sdkVersion;
+    private String screen_name;
+
 
     public String getPackageName() {
-        return packageName;
+        return screen_name;
     }
 
     public String getChannel() {
@@ -54,27 +105,24 @@ public class CommonBean implements Serializable {
     }
 
     public String getVersion() {
-        return version;
+        return app_version;
     }
 
-    public String getPosition() {
-        return position;
-    }
 
     public String getDeviceId() {
-        return deviceId;
+        return device_id;
     }
 
-    public String getPhoneBrand() {
-        return phoneBrand;
+    public String getManufacturer() {
+        return manufacturer;
     }
 
     public String getOSVersion() {
-        return OSVersion;
+        return os_version;
     }
 
     public String getSdkVersion() {
-        return sdkVersion;
+        return sdk_version;
     }
 
     public CommonBean(Context context) {
@@ -82,26 +130,30 @@ public class CommonBean implements Serializable {
     }
 
     private void initData(Context context) {
-        packageName = AppUtil.getPackageName(context);
+        screen_name = AppUtil.getPackageName(context);
         channel = AppUtil.getChannel(context);
-        version = AppUtil.getAppVersionName(context);
-        deviceId = AppUtil.getDeviceId(context);
-        phoneBrand = AppUtil.getPhoneBrand(context);
-        OSVersion = AppUtil.getOSVersion();
-        sdkVersion = "100";
+        app_version = AppUtil.getAppVersionName(context);
+        device_id = AppUtil.getDeviceId(context);
+        manufacturer = AppUtil.getPhoneBrand(context);
+        os_version = AppUtil.getOSVersion();
+        network_type = NetworkUtils.networkType(context);
+        sdk_version = "1.0.0";
     }
 
     public String getParameters(String sign) {
         StringBuilder builder = new StringBuilder();
         builder.append(sign)
-                .append("packageName=").append(packageName)
+                .append("screen_name=").append(screen_name)
                 .append("&channel=").append(channel)
-                .append("&version=").append(version)
-                .append("&position=").append(position)
-                .append("&deviceId=").append(deviceId)
-                .append("&phoneBrand=").append(phoneBrand)
-                .append("&sdkVersion=").append(sdkVersion)
-                .append("&OSVersion=").append(OSVersion);
+                .append("&app_version=").append(app_version)
+                .append("&longitude=").append(longitude)
+                .append("&latitude=").append(latitude)
+
+                .append("&network_type=").append(network_type)
+                .append("&device_id=").append(device_id)
+                .append("&manufacturer=").append(manufacturer)
+                .append("&sdk_version=").append(sdk_version)
+                .append("&os_version=").append(os_version);
         return builder.toString();
     }
 }

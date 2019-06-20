@@ -1,10 +1,12 @@
 package com.cl.tracker_cl;
 
-import android.text.TextUtils;
+import android.content.Context;
 
 import com.cl.tracker_cl.http.DATA_PROTOCOL;
 import com.cl.tracker_cl.http.UPLOAD_CATEGORY;
 import com.cl.tracker_cl.util.LogUtil;
+
+import org.litepal.LitePal;
 
 
 /**
@@ -32,7 +34,7 @@ public class TrackConfiguration {
     /**
      * 上传统计数据的URL
      */
-    private String pgyServerUrl;
+    private String serverUrl;
 
     /**
      * 上传日志信息的公共参数, URL参数的形式
@@ -58,6 +60,13 @@ public class TrackConfiguration {
         return this;
     }
 
+
+    public TrackConfiguration initializeDb(Context context) {
+        LitePal.initialize(context);
+        return this;
+    }
+
+
     public String getConfigUrl() {
         return configUrl;
     }
@@ -76,13 +85,13 @@ public class TrackConfiguration {
         return this;
     }
 
-    public String getPgyServerUrl() {
-        return pgyServerUrl;
+    public String getServerUrl() {
+        return serverUrl;
     }
 
 
-    public TrackConfiguration setPgyServerUrl(String uploadUrl) {
-        this.pgyServerUrl = uploadUrl;
+    public TrackConfiguration setServerUrl(String uploadUrl) {
+        this.serverUrl = uploadUrl;
         return this;
     }
 
@@ -107,9 +116,6 @@ public class TrackConfiguration {
 
     public TrackConfiguration setCommonParameter(String commonParameter) {
         this.commonParameter = commonParameter;
-        if (!TextUtils.isEmpty(pgyServerUrl)) {
-            pgyServerUrl += commonParameter;
-        }
         return this;
     }
 
