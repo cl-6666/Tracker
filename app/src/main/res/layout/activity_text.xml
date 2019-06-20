@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".TextActivity">
+
+
+    <Button
+        android:id="@+id/btn_fh"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="返回"
+        tools:layout_editor_absoluteX="89dp"
+        tools:layout_editor_absoluteY="275dp" />
+
+
+    <Button
+        android:id="@+id/btn_sj"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="事件监听"
+        tools:layout_editor_absoluteX="216dp"
+        tools:layout_editor_absoluteY="275dp" />
+
+
+</LinearLayout>
