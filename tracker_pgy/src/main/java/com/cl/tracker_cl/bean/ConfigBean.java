@@ -1,7 +1,6 @@
 package com.cl.tracker_cl.bean;
 
 import com.cl.tracker_cl.TrackConfiguration;
-import com.cl.tracker_cl.http.BaseProtocolBean;
 
 import java.util.List;
 

@@ -80,7 +80,7 @@ public class ViewClickedEventListener extends View.AccessibilityDelegate {
     public void sendAccessibilityEvent(View host, int eventType) {
         super.sendAccessibilityEvent(host, eventType);
         if (AccessibilityEvent.TYPE_VIEW_CLICKED == eventType && host != null) {
-            Tracker.getInstance().addClickEvent(host, (Fragment) host.getTag(FRAGMENT_TAG_KEY));
+            Tracker.getInstance().addClickEvent(host);
         }
     }
 

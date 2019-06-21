@@ -10,6 +10,13 @@ import com.cl.tracker_cl.util.LogUtil;
 
 public class MyApp extends Application {
 
+
+    /**
+     * 采集数据的地址
+     */
+    private final static String SA_SERVER_URL = "https://sdkdebugtest.datasink.sensorsdata.cn/sa?project=default&token=cfb8b60e42e0ae9b";
+
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -20,7 +27,7 @@ public class MyApp extends Application {
                 // 设置日志的上传策略
                 .setUploadCategory(UPLOAD_CATEGORY.REAL_TIME.getValue())
                 // 设置埋点信息上传的URL
-                .setServerUrl("http://m.baidu.com")
+                .setServerUrl(SA_SERVER_URL)
                 //本地缓存的最大事件数目，当累积日志量达到阈值时发送数据，默认值 100
                 .setFlushBulkSize(100)
                 //设置本地缓存最多事件条数，默认为 10000 条

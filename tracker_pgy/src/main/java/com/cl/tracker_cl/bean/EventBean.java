@@ -98,15 +98,11 @@ public class EventBean extends BaseBean {
      * 为预览页面事件生成path
      *
      * @param context
-     * @param fragment
      * @return
      */
-    public static String generateViewPath(@NonNull Context context, Fragment fragment) {
+    public static String generateViewPath(@NonNull Context context) {
         StringBuilder builder = new StringBuilder();
         builder.append(context.getClass().getName());
-        if (fragment != null) {
-            builder.append("$").append(fragment.getClass().getName());
-        }
         return builder.toString();
     }
 
@@ -114,11 +110,10 @@ public class EventBean extends BaseBean {
      * 为点击事件生成path
      *
      * @param view
-     * @param fragment
      * @return
      */
-    public static String generateClickedPath(@NonNull View view, Fragment fragment) {
-        StringBuilder builder = new StringBuilder(generateViewPath(view.getContext(), fragment));
+    public static String generateClickedPath(@NonNull View view) {
+        StringBuilder builder = new StringBuilder(generateViewPath(view.getContext()));
         builder.append("$").append(view.getClass().getName());
         if (view.getId() != View.NO_ID) {
             String resourceName = view.getResources().getResourceEntryName(view.getId());

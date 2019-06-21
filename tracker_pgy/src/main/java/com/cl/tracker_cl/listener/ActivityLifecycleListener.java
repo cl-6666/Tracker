@@ -67,7 +67,7 @@ public class ActivityLifecycleListener implements Application.ActivityLifecycleC
     public void onActivityDestroyed(Activity activity) {
         long duration = durationMap.get(activity);
         if (duration > 0) {
-            Tracker.getInstance().addViewEvent(activity, null, duration);
+            Tracker.getInstance().addViewEvent(activity, duration);
         }
         resumeTimeMap.remove(activity);
         durationMap.remove(activity);

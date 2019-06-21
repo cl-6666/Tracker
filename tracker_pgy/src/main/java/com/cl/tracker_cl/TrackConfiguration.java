@@ -2,7 +2,6 @@ package com.cl.tracker_cl;
 
 import android.content.Context;
 
-import com.cl.tracker_cl.http.DATA_PROTOCOL;
 import com.cl.tracker_cl.http.UPLOAD_CATEGORY;
 import com.cl.tracker_cl.util.LogUtil;
 

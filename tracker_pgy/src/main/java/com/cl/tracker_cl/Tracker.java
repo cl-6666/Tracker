@@ -4,23 +4,16 @@ import android.app.Application;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.view.View;
 
 import com.cl.tracker_cl.bean.CommonBean;
-import com.cl.tracker_cl.bean.ConfigBean;
 import com.cl.tracker_cl.bean.EventBean;
 import com.cl.tracker_cl.bean.ISensorsDataAPI;
 import com.cl.tracker_cl.bean.SensorsDataDynamicSuperProperties;
-import com.cl.tracker_cl.http.BaseBean;
-import com.cl.tracker_cl.http.BaseProtocolBean;
-import com.cl.tracker_cl.http.HttpManager;
 import com.cl.tracker_cl.http.UPLOAD_CATEGORY;
-import com.cl.tracker_cl.http.UploadEventService;
 import com.cl.tracker_cl.util.LogUtil;
 import com.cl.tracker_cl.util.SharedPreferencesUtil;
-import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,24 +24,12 @@ import java.util.List;
  */
 public class Tracker implements ISensorsDataAPI {
 
-    /**
-     * 需要收集的事件列表
-     */
-    private List<String> validEventPathList = null;
-    /**
-     * 保存产生的事件
-     */
-    private List<EventBean> eventList = new ArrayList<>();
-
     private Context mContext;
     private TrackConfiguration config;
     private CommonBean commonInfo;
     private SensorsDataDynamicSuperProperties mDynamicSuperProperties;
 
-
     private final int UPLOAD_EVENT_WHAT = 0xff01;
-    private final int MAX_EVENT_COUNT = 50;
-    private final int DEFAULT_CLEAR_COUNT = 30;
 
 
     private Handler handler = new Handler() {
@@ -78,8 +59,6 @@ public class Tracker implements ISensorsDataAPI {
         }
         this.mContext = context;
         setTrackerConfig(config);
-        //监听生命周期
-//        context.registerActivityLifecycleCallbacks(new ActivityLifecycleListener());
         commonInfo = new CommonBean(mContext);
         LogUtil.e("公共参数：" + commonInfo.getParameters("sss"));
         SharedPreferencesUtil.getInstance().init(context);
@@ -95,24 +74,7 @@ public class Tracker implements ISensorsDataAPI {
      * 从服务器请求埋点的配置信息
      */
     private void startRequestConfig() {
-        HttpManager.getInstance(mContext).getQuery(config.getConfigUrl(), ConfigBean.class,
-                new HttpManager.OnRequestListener<ConfigBean.DataBean>() {
-                    @Override
-                    public void onSuccess(ConfigBean.DataBean result) {
-                        if (result != null) {
-                            setTrackerConfig(result.baseConfig);
-                            validEventPathList = getValidEventList(result.validEventList);
-                        }
-                        handler.sendEmptyMessage(UPLOAD_EVENT_WHAT);
-                        LogUtil.i("get config success");
-                    }
 
-                    @Override
-                    public void onError(int code, String errMsg) {
-                        validEventPathList = getValidEventList(null);
-                        LogUtil.i("get config failed " + errMsg);
-                    }
-                });
     }
 
     /**
@@ -135,21 +97,19 @@ public class Tracker implements ISensorsDataAPI {
      * 添加浏览页面事件
      *
      * @param context
-     * @param fragment
      * @param duration
      */
-    public void addViewEvent(Context context, Fragment fragment, long duration) {
-        addEvent(new EventBean(EventBean.generateViewPath(context, fragment), duration));
+    public void addViewEvent(Context context, long duration) {
+        addEvent(new EventBean(EventBean.generateViewPath(context), duration));
     }
 
     /**
      * 添加点击事件
      *
      * @param view
-     * @param fragment
      */
-    public void addClickEvent(View view, Fragment fragment) {
-        addEvent(new EventBean(EventBean.generateClickedPath(view, fragment)));
+    public void addClickEvent(View view) {
+        addEvent(new EventBean(EventBean.generateClickedPath(view)));
     }
 
     private void addEvent(final EventBean eventInfo) {
@@ -158,7 +118,7 @@ public class Tracker implements ISensorsDataAPI {
 
         switch (config.getUploadCategory()) {
             case REAL_TIME:
-
+                commitRealTimeEvent(eventInfo);
                 break;
 
             case NEXT_LAUNCH:
@@ -180,25 +140,8 @@ public class Tracker implements ISensorsDataAPI {
             default:
 
                 break;
-
-//            UploadEventService.enter(context, config.getHostName(), config.getHostPort(), null);
         }
 
-        if (config.getUploadCategory() == UPLOAD_CATEGORY.REAL_TIME) {
-            commitRealTimeEvent(eventInfo);
-        } else {
-            if (validEventPathList != null && validEventPathList.size() > 0
-                    && !validEventPathList.contains(eventInfo.getPath())) {
-                return;
-            }
-            eventList.add(eventInfo);
-
-//            DatabaseManager.getInstance(mContext.getApplicationContext()).insertData(eventInfo);
-
-            if (eventList.size() >= MAX_EVENT_COUNT) {
-                eventList.remove(eventList.subList(0, DEFAULT_CLEAR_COUNT));
-            }
-        }
     }
 
     /**
@@ -207,7 +150,7 @@ public class Tracker implements ISensorsDataAPI {
      * @param eventInfo
      */
     private void commitRealTimeEvent(EventBean eventInfo) {
-        UploadEventService.enter(mContext, eventInfo);
+
     }
 
     /**
@@ -218,11 +161,6 @@ public class Tracker implements ISensorsDataAPI {
 
     }
 
-    private byte[] convertDataToJson(List<EventBean> eventList) {
-        return BaseBean.toJson(eventList, new TypeToken<List<EventBean>>() {
-        }.getType()).getBytes();
-    }
-
 
     /**
      * 上传埋点数据
@@ -230,43 +168,15 @@ public class Tracker implements ISensorsDataAPI {
      * @param data
      */
     private void realUploadEventInfo(byte[] data) {
-        if (data == null || data.length == 0) {
-            return;
-        }
-        HttpManager.getInstance(mContext).postQuery(config.getServerUrl(), data, BaseProtocolBean.class,
-                new HttpManager.OnRequestListener() {
-                    @Override
-                    public void onSuccess(Object result) {
-                        LogUtil.i("event info upload success");
-                    }
 
-                    @Override
-                    public void onError(int code, String errMsg) {
-                        LogUtil.i("event info upload failed " + errMsg);
-                    }
-                });
+
     }
 
     /**
      * 提交新设备信息到服务器
      */
     private void submitDeviceInfo() {
-        String deviceInfo = config.getDeviceInfo();
-        if (TextUtils.isEmpty(deviceInfo)) {
-            deviceInfo = commonInfo.getParameters(config.getNewDeviceUrl().contains("?") ? "&" : "?");
-        }
-        HttpManager.getInstance(mContext).postQuery(config.getNewDeviceUrl(), deviceInfo,
-                BaseProtocolBean.class, new HttpManager.OnRequestListener() {
-                    @Override
-                    public void onSuccess(Object result) {
-                        LogUtil.i("deviceInfo submit success");
-                    }
 
-                    @Override
-                    public void onError(int code, String errMsg) {
-                        LogUtil.i("deviceInfo submit failed " + errMsg);
-                    }
-                });
     }
 
     /**
@@ -276,7 +186,7 @@ public class Tracker implements ISensorsDataAPI {
      */
     @Override
     public void registerDynamicSuperProperties(SensorsDataDynamicSuperProperties dynamicSuperProperties) {
-
+        mDynamicSuperProperties = dynamicSuperProperties;
     }
 
     /**
@@ -293,7 +203,11 @@ public class Tracker implements ISensorsDataAPI {
 
     @Override
     public void getDistinctId(String user_id) {
-        SharedPreferencesUtil.getInstance().saveParam("user_id", user_id);
+        if (TextUtils.isEmpty(user_id)) {
+            SharedPreferencesUtil.getInstance().remove("user_id");
+        } else {
+            SharedPreferencesUtil.getInstance().saveParam("user_id", user_id);
+        }
     }
 
     @Override

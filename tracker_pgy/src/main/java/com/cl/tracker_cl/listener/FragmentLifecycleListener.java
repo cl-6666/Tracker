@@ -57,7 +57,7 @@ public class FragmentLifecycleListener extends FragmentManager.FragmentLifecycle
 		super.onFragmentDetached(fm, f);
 		long duration = durationMap.get(f);
 		if (duration > 0) {
-			Tracker.getInstance().addViewEvent(f.getActivity(), f, duration);
+			Tracker.getInstance().addViewEvent(f.getActivity(), duration);
 		}
 		resumeTimeMap.remove(f);
 		durationMap.remove(f);
