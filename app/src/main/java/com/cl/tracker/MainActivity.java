@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 TextActivity.enter(MainActivity.this, 1);
-                // Tracker.getInstance().setGPSLocation(2323.32,4232.32);   //测试经纬度
+                Tracker.getInstance().setGPSLocation(1323.32,4232.32);   //测试经纬度
             }
         });
 

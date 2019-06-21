@@ -35,7 +35,8 @@ public class TextActivity extends AppCompatActivity {
         mButton2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ViewClickedEventListener.getInstance().setActivityTracker(TextActivity.this);
+//                ViewClickedEventListener.getInstance().setActivityTracker(TextActivity.this);
+                Tracker.getInstance().getDistinctId("");   //测试经纬度
 
             }
         });

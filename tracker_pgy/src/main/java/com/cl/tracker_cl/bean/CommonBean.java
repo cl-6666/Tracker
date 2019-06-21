@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.cl.tracker_cl.util.AppUtil;
 import com.cl.tracker_cl.util.NetworkUtils;
+import com.cl.tracker_cl.util.SharedPreferencesUtil;
 
 import java.io.Serializable;
 
@@ -52,11 +53,11 @@ public class CommonBean implements Serializable {
     /**
      * 经度
      */
-    private String longitude;
+    private long longitude;
     /**
      * 纬度
      */
-    private String latitude;
+    private long latitude;
 
     /**
      * SDK类型，例如android，ios，java，javascript等
@@ -96,36 +97,14 @@ public class CommonBean implements Serializable {
     private String screen_name;
 
 
-    public String getPackageName() {
-        return screen_name;
-    }
+    /**
+     * 用户ID（已经登录则传userId，未登录则为空串）
+     */
+    private String user_id = null;
 
-    public String getChannel() {
-        return channel;
-    }
-
-    public String getVersion() {
-        return app_version;
-    }
-
-
-    public String getDeviceId() {
-        return device_id;
-    }
-
-    public String getManufacturer() {
-        return manufacturer;
-    }
-
-    public String getOSVersion() {
-        return os_version;
-    }
-
-    public String getSdkVersion() {
-        return sdk_version;
-    }
 
     public CommonBean(Context context) {
+        SharedPreferencesUtil.getInstance().init(context);
         initData(context);
     }
 
@@ -137,7 +116,14 @@ public class CommonBean implements Serializable {
         manufacturer = AppUtil.getPhoneBrand(context);
         os_version = AppUtil.getOSVersion();
         network_type = NetworkUtils.networkType(context);
+        model = AppUtil.getSystemModel();
+        wifi_name = NetworkUtils.getSSID(context);
         sdk_version = "1.0.0";
+        sdk = "android";
+        app_name = AppUtil.getAppName(context);
+        longitude = (long) SharedPreferencesUtil.getInstance().getParam("latitude", (long) 0);
+        latitude = (long) SharedPreferencesUtil.getInstance().getParam("latitude", (long) 0);
+        user_id = (String) SharedPreferencesUtil.getInstance().getParam("user_id", "");
     }
 
     public String getParameters(String sign) {
@@ -148,6 +134,11 @@ public class CommonBean implements Serializable {
                 .append("&app_version=").append(app_version)
                 .append("&longitude=").append(longitude)
                 .append("&latitude=").append(latitude)
+                .append("&user_id=").append(user_id)
+                .append("&sdk=").append(sdk)
+                .append("&app_name=").append(app_name)
+                .append("&model=").append(model)
+                .append("&wifi_name=").append(wifi_name)
 
                 .append("&network_type=").append(network_type)
                 .append("&device_id=").append(device_id)

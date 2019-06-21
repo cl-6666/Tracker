@@ -40,10 +40,19 @@ public class TrackConfiguration {
      * 上传日志信息的公共参数, URL参数的形式
      */
     private String commonParameter;
+
     /**
      * 保存新设备的信息，将需要上传的设备信息以URL参数的形式拼接，如"deviceId=12345&os_version=7.0"
      */
     private String deviceInfo;
+
+    private int mFlushBulkSize = 100;
+
+    /**
+     * 设置本地缓存最多事件条数，默认为 10000 条
+     */
+    private int mMaxCacheSize = 10000;
+
 
     private UPLOAD_CATEGORY _uploadCategory;
     private DATA_PROTOCOL _dataProtocol;
@@ -67,8 +76,24 @@ public class TrackConfiguration {
     }
 
 
-    public String getConfigUrl() {
-        return configUrl;
+    public TrackConfiguration setFlushBulkSize(int flushBulkSize) {
+        this.mFlushBulkSize = flushBulkSize;
+        return this;
+    }
+
+
+    public TrackConfiguration setMaxCacheSize(int maxCacheSize) {
+        if (maxCacheSize >= 10000) {
+            mMaxCacheSize = 10000;
+        } else {
+            mMaxCacheSize = maxCacheSize;
+        }
+        return this;
+    }
+
+    public TrackConfiguration setDeviceInfo(String deviceInfo) {
+        this.deviceInfo = deviceInfo;
+        return this;
     }
 
     public TrackConfiguration setConfigUrl(String configUrl) {
@@ -76,17 +101,9 @@ public class TrackConfiguration {
         return this;
     }
 
-    public String getNewDeviceUrl() {
-        return newDeviceUrl;
-    }
-
     public TrackConfiguration setNewDeviceUrl(String newDeviceUrl) {
         this.newDeviceUrl = newDeviceUrl;
         return this;
-    }
-
-    public String getServerUrl() {
-        return serverUrl;
     }
 
 
@@ -106,6 +123,28 @@ public class TrackConfiguration {
         return this;
     }
 
+
+    public TrackConfiguration setCommonParameter(String commonParameter) {
+        this.commonParameter = commonParameter;
+        return this;
+    }
+
+
+    public String getConfigUrl() {
+        return configUrl;
+    }
+
+
+    public String getNewDeviceUrl() {
+        return newDeviceUrl;
+    }
+
+
+    public String getServerUrl() {
+        return serverUrl;
+    }
+
+
     public boolean isOpenLog() {
         return openLog;
     }
@@ -114,19 +153,11 @@ public class TrackConfiguration {
         return commonParameter;
     }
 
-    public TrackConfiguration setCommonParameter(String commonParameter) {
-        this.commonParameter = commonParameter;
-        return this;
-    }
 
     public String getDeviceInfo() {
         return deviceInfo;
     }
 
-    public TrackConfiguration setDeviceInfo(String deviceInfo) {
-        this.deviceInfo = deviceInfo;
-        return this;
-    }
 
     public UPLOAD_CATEGORY getUploadCategory() {
         return _uploadCategory;
@@ -134,5 +165,14 @@ public class TrackConfiguration {
 
     public DATA_PROTOCOL getDataProtocol() {
         return _dataProtocol;
+    }
+
+
+    public int getmFlushBulkSize() {
+        return mFlushBulkSize;
+    }
+
+    public int getmMaxCacheSize() {
+        return mMaxCacheSize;
     }
 }

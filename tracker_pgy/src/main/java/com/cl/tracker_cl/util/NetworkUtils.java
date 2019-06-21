@@ -6,6 +6,8 @@ import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.telephony.TelephonyManager;
 
@@ -118,6 +120,22 @@ public class NetworkUtils {
             LogUtil.printStackTrace(e);
             return false;
         }
+    }
+    /**
+     * 获取当前连接WIFI的SSID
+     */
+    public static String getSSID(Context context) {
+        WifiManager wm = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        if (wm != null) {
+            WifiInfo winfo = wm.getConnectionInfo();
+            if (winfo != null) {
+                String s = winfo.getSSID();
+                if (s.length() > 2 && s.charAt(0) == '"' && s.charAt(s.length() - 1) == '"') {
+                    return s.substring(1, s.length() - 1);
+                }
+            }
+        }
+        return "";
     }
 
 

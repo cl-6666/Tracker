@@ -1,6 +1,5 @@
 package com.cl.tracker_cl;
 
-import android.Manifest;
 import android.app.Application;
 import android.content.Context;
 import android.os.Handler;
@@ -12,17 +11,16 @@ import android.view.View;
 import com.cl.tracker_cl.bean.CommonBean;
 import com.cl.tracker_cl.bean.ConfigBean;
 import com.cl.tracker_cl.bean.EventBean;
-import com.cl.tracker_cl.db.TrackData;
+import com.cl.tracker_cl.bean.ISensorsDataAPI;
+import com.cl.tracker_cl.bean.SensorsDataDynamicSuperProperties;
 import com.cl.tracker_cl.http.BaseBean;
 import com.cl.tracker_cl.http.BaseProtocolBean;
 import com.cl.tracker_cl.http.HttpManager;
 import com.cl.tracker_cl.http.UPLOAD_CATEGORY;
 import com.cl.tracker_cl.http.UploadEventService;
 import com.cl.tracker_cl.util.LogUtil;
+import com.cl.tracker_cl.util.SharedPreferencesUtil;
 import com.google.gson.reflect.TypeToken;
-
-import org.litepal.LitePal;
-import org.litepal.exceptions.DataSupportException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +29,7 @@ import java.util.List;
 /**
  * 事件管理
  */
-public class Tracker {
+public class Tracker implements ISensorsDataAPI {
 
     /**
      * 需要收集的事件列表
@@ -45,7 +43,8 @@ public class Tracker {
     private Context mContext;
     private TrackConfiguration config;
     private CommonBean commonInfo;
-    private TrackData mTrackData;
+    private SensorsDataDynamicSuperProperties mDynamicSuperProperties;
+
 
     private final int UPLOAD_EVENT_WHAT = 0xff01;
     private final int MAX_EVENT_COUNT = 50;
@@ -83,6 +82,7 @@ public class Tracker {
 //        context.registerActivityLifecycleCallbacks(new ActivityLifecycleListener());
         commonInfo = new CommonBean(mContext);
         LogUtil.e("公共参数：" + commonInfo.getParameters("sss"));
+        SharedPreferencesUtil.getInstance().init(context);
     }
 
     private void setTrackerConfig(TrackConfiguration config) {
@@ -153,7 +153,9 @@ public class Tracker {
     }
 
     private void addEvent(final EventBean eventInfo) {
+
         LogUtil.i("EventBean:" + eventInfo.toString());
+
         switch (config.getUploadCategory()) {
             case REAL_TIME:
 
@@ -267,33 +269,40 @@ public class Tracker {
                 });
     }
 
-    public static class Singleton {
-        private final static Tracker instance = new Tracker();
-    }
+    /**
+     * 注册事件动态公共属性
+     *
+     * @param dynamicSuperProperties 事件动态公共属性回调接口
+     */
+    @Override
+    public void registerDynamicSuperProperties(SensorsDataDynamicSuperProperties dynamicSuperProperties) {
 
+    }
 
     /**
      * 更新 GPS 位置信息
      *
-     * @param latitude
-     * @param longitude
+     * @param latitude  纬度
+     * @param longitude 经度
      */
+    @Override
     public void setGPSLocation(double latitude, double longitude) {
-        mTrackData = new TrackData();
-        mTrackData.setLatitude(String.valueOf(latitude));
-        mTrackData.setLongitude(String.valueOf(longitude));
-        mTrackData.save();
-
+        SharedPreferencesUtil.getInstance().saveParam("latitude", (long) (latitude * Math.pow(10, 6)));
+        SharedPreferencesUtil.getInstance().saveParam("longitude", (long) (longitude * Math.pow(10, 6)));
     }
 
+    @Override
+    public void getDistinctId(String user_id) {
+        SharedPreferencesUtil.getInstance().saveParam("user_id", user_id);
+    }
 
-    /**
-     * 标识用户登录的id
-     *
-     * @param logType
-     */
-    public void setLogType(String logType) {
+    @Override
+    public boolean isVisualizedAutoTrackEnabled() {
+        return false;
+    }
 
+    public static class Singleton {
+        private final static Tracker instance = new Tracker();
     }
 
 

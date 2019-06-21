@@ -33,7 +33,6 @@
     -->
     <list>
         <mapping class="com.cl.tracker_cl.db.TrackerDb"></mapping>
-        <mapping class="com.cl.tracker_cl.db.TrackData"></mapping>
     </list>
 
     <!--
