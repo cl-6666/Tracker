@@ -1,7 +1,12 @@
 # sdk介绍
-初始化操作：
+### 内部使用第三方库  
+https://github.com/alibaba/fastjson  
+https://github.com/LitePalFramework/LitePal  
+
+### 初始化操作   
 ...............
-* 埋点库里内部自动封装了一些公共参数：
+
+### 埋点库里内部自动封装了一些公共参数  
 ```Java
  device_id	string	设备ID（有权限时候直接获取，没有权限获取硬件码生成唯一id，使用uuid）
  network_type	string	例如 WIFI、4G等
