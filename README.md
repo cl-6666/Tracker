@@ -25,7 +25,19 @@ https://github.com/LitePalFramework/LitePal
                 .setCommonParameter("?channel=mi&version=1.0");
         Tracker.getInstance().init(this, configuration);
 ```
-
+### 使用方法
+```Java
+ 保存用户id
+ Tracker.getInstance().getDistinctId("9771C579-71F0-4650-8EE8-8999FA717761");
+ 清空用户id-传空就好了
+ Tracker.getInstance().getDistinctId("");
+ 上传经纬度
+ Tracker.getInstance().setGPSLocation(1323.32, 4232.32);   //测试经纬度
+ 点击事件
+ Tracker.getInstance().addClickEvent(view);
+ 页面事件
+ Tracker.getInstance().addViewEvent();
+```
 ### 埋点库里内部自动封装了一些公共参数  
 ```Java
  device_id	string	设备ID（有权限时候直接获取，没有权限获取硬件码生成唯一id，使用uuid）
