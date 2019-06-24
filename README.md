@@ -4,7 +4,15 @@
 https://github.com/alibaba/fastjson  
 https://github.com/LitePalFramework/LitePal  
 
-
+### 数据上传策略  
+```Java
+   REAL_TIME(0),           // 实时传输，用于收集配置信息
+    NEXT_LAUNCH(-1),        // 下次启动时上传
+    NEXT_15_MINUTER(15),    // 每15分钟上传一次
+    NEXT_30_MINUTER(30),    // 每30分钟上传一次
+    NEXT_CACHE(1),       // 使用本地缓存策略
+    NEXT_KNOWN_MINUTER(-1); // 使用服务器下发的上传策略
+```
 ### 初始化操作 
 ```Java
  TrackConfiguration configuration = new TrackConfiguration()
