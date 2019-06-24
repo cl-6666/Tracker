@@ -246,6 +246,7 @@ public class Tracker implements ISensorsDataAPI {
         mDynamicSuperProperties = dynamicSuperProperties;
     }
 
+
     /**
      * 更新 GPS 位置信息
      *
