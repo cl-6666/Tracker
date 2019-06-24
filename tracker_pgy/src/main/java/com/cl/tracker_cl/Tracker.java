@@ -6,14 +6,23 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.Toast;
 
+import com.alibaba.fastjson.JSON;
 import com.cl.tracker_cl.bean.CommonBean;
 import com.cl.tracker_cl.bean.EventBean;
 import com.cl.tracker_cl.bean.ISensorsDataAPI;
 import com.cl.tracker_cl.bean.SensorsDataDynamicSuperProperties;
+import com.cl.tracker_cl.db.TrackerDb;
+import com.cl.tracker_cl.http.BaseBean;
+import com.cl.tracker_cl.http.IDataListener;
+import com.cl.tracker_cl.http.PgyHttp;
 import com.cl.tracker_cl.http.UPLOAD_CATEGORY;
 import com.cl.tracker_cl.util.LogUtil;
 import com.cl.tracker_cl.util.SharedPreferencesUtil;
+
+import org.litepal.LitePal;
+import org.litepal.crud.callback.FindMultiCallback;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +37,9 @@ public class Tracker implements ISensorsDataAPI {
     private TrackConfiguration config;
     private CommonBean commonInfo;
     private SensorsDataDynamicSuperProperties mDynamicSuperProperties;
+
+    //需要上传的数据
+    private List<TrackerDb> mTrackerDbs = new ArrayList<>();
 
     private final int UPLOAD_EVENT_WHAT = 0xff01;
 
@@ -114,8 +126,6 @@ public class Tracker implements ISensorsDataAPI {
 
     private void addEvent(final EventBean eventInfo) {
 
-        LogUtil.i("EventBean:" + eventInfo.toString());
-
         switch (config.getUploadCategory()) {
             case REAL_TIME:
                 commitRealTimeEvent(eventInfo);
@@ -137,10 +147,44 @@ public class Tracker implements ISensorsDataAPI {
 
                 break;
 
+            case NEXT_CACHE:
+                //存数据库
+                addData(eventInfo);
+                break;
+
             default:
 
                 break;
         }
+
+    }
+
+
+    /**
+     * 使用缓存处理方式上传
+     *
+     * @param eventInfo
+     */
+    private void addData(EventBean eventInfo) {
+        String str_json = JSON.toJSONString(commonInfo.toString()); //
+        LogUtil.e("实体转化为Json" + str_json);
+        LogUtil.e("EventBean:" + eventInfo.toString());
+        mTrackerDbs.add(new TrackerDb("点击测试事件", str_json, String.valueOf(eventInfo.getEventTime())));
+        //每10条入一次库
+        if (mTrackerDbs.size() == 10) {
+            LitePal.saveAll(mTrackerDbs);
+            mTrackerDbs.removeAll(mTrackerDbs);
+        }
+        LogUtil.e("条数:" + mTrackerDbs.size());
+        // 异步查询示例
+        LitePal.findAllAsync(TrackerDb.class).listen(new FindMultiCallback<TrackerDb>() {
+            @Override
+            public void onFinish(List<TrackerDb> allSongs) {
+                LogUtil.e("数据库条数：" + allSongs.size());
+//                if (allSongs.size() < 100) return;
+                realUploadEventInfo(allSongs);
+            }
+        });
 
     }
 
@@ -154,7 +198,7 @@ public class Tracker implements ISensorsDataAPI {
     }
 
     /**
-     * 上传埋点数据
+     * 实时上传埋点数据
      */
     private synchronized void uploadEventInfo() {
 
@@ -165,10 +209,23 @@ public class Tracker implements ISensorsDataAPI {
     /**
      * 上传埋点数据
      *
-     * @param data
+     * @param allSongs
      */
-    private void realUploadEventInfo(byte[] data) {
+    private void realUploadEventInfo(List<TrackerDb> allSongs) {
+        LogUtil.e("URL:" + config.getServerUrl());
+        //Student为自己定义的javaBean
+        PgyHttp.sendJsonRequest(allSongs, config.getServerUrl(), BaseBean.class, new IDataListener<BaseBean>() {
+            @Override
+            public void onSuccess(BaseBean student) {
+                LogUtil.e("成功");
 
+            }
+
+            @Override
+            public void onFailure() {
+                LogUtil.e("失败");
+            }
+        });
 
     }
 

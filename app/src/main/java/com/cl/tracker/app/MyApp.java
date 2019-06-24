@@ -25,7 +25,7 @@ public class MyApp extends Application {
                 .openLog(true)
                 .initializeDb(this)
                 // 设置日志的上传策略
-                .setUploadCategory(UPLOAD_CATEGORY.REAL_TIME.getValue())
+                .setUploadCategory(UPLOAD_CATEGORY.NEXT_CACHE.getValue())
                 // 设置埋点信息上传的URL
                 .setServerUrl(SA_SERVER_URL)
                 //本地缓存的最大事件数目，当累积日志量达到阈值时发送数据，默认值 100

@@ -13,16 +13,32 @@ import org.litepal.crud.LitePalSupport;
  */
 public class TrackerDb extends LitePalSupport {
 
-    private int type;
+    private String type;
     private String userData;
     private String eventTime;
 
 
-    public int getType() {
+    public TrackerDb(String type, String userData, String eventTime) {
+        this.type = type;
+        this.userData = userData;
+        this.eventTime = eventTime;
+    }
+
+
+    @Override
+    public String toString() {
+        return "TrackerDb{" +
+                "type='" + type + '\'' +
+                ", userData='" + userData + '\'' +
+                ", eventTime='" + eventTime + '\'' +
+                '}';
+    }
+
+    public String getType() {
         return type;
     }
 
-    public void setType(int type) {
+    public void setType(String type) {
         this.type = type;
     }
 

@@ -54,12 +54,10 @@ public class TrackConfiguration {
 
 
     private UPLOAD_CATEGORY _uploadCategory;
-    private DATA_PROTOCOL _dataProtocol;
 
     public TrackConfiguration() {
         openLog = false;
         _uploadCategory = UPLOAD_CATEGORY.NEXT_LAUNCH;
-        _dataProtocol = DATA_PROTOCOL.PROTOCOL_BUFFER;
     }
 
     public TrackConfiguration openLog(boolean openLog) {
@@ -117,11 +115,6 @@ public class TrackConfiguration {
         return this;
     }
 
-    public TrackConfiguration setDataProtocol(int dataProtocol) {
-        this._dataProtocol = DATA_PROTOCOL.getDataProtocol(dataProtocol);
-        return this;
-    }
-
 
     public TrackConfiguration setCommonParameter(String commonParameter) {
         this.commonParameter = commonParameter;
@@ -160,10 +153,6 @@ public class TrackConfiguration {
 
     public UPLOAD_CATEGORY getUploadCategory() {
         return _uploadCategory;
-    }
-
-    public DATA_PROTOCOL getDataProtocol() {
-        return _dataProtocol;
     }
 
 

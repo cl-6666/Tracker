@@ -100,8 +100,33 @@ public class CommonBean implements Serializable {
     /**
      * 用户ID（已经登录则传userId，未登录则为空串）
      */
-    private String user_id = null;
+    private String user_id;
 
+
+    @Override
+    public String toString() {
+        return "CommonBean{" +
+                "device_id='" + device_id + '\'' +
+                ", network_type='" + network_type + '\'' +
+                ", wifi_name='" + wifi_name + '\'' +
+                ", screen_width='" + screen_width + '\'' +
+                ", screen_height='" + screen_height + '\'' +
+                ", os='" + os + '\'' +
+                ", os_version='" + os_version + '\'' +
+                ", manufacturer='" + manufacturer + '\'' +
+                ", model='" + model + '\'' +
+                ", longitude=" + longitude +
+                ", latitude=" + latitude +
+                ", sdk='" + sdk + '\'' +
+                ", sdk_version='" + sdk_version + '\'' +
+                ", app_version='" + app_version + '\'' +
+                ", app_name='" + app_name + '\'' +
+                ", channel='" + channel + '\'' +
+                ", title='" + title + '\'' +
+                ", screen_name='" + screen_name + '\'' +
+                ", user_id='" + user_id + '\'' +
+                '}';
+    }
 
     public CommonBean(Context context) {
         SharedPreferencesUtil.getInstance().init(context);
