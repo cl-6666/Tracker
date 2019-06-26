@@ -5,8 +5,11 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 
 class SensorsAnalyticsPlugin implements Plugin<Project> {
+
     void apply(Project project) {
+        SensorsAnalyticsExtension extension = project.extensions.create("sensorsAnalytics", SensorsAnalyticsExtension)
+
         AppExtension appExtension = project.extensions.findByType(AppExtension.class)
-        appExtension.registerTransform(new SensorsAnalyticsTransform(project))
+        appExtension.registerTransform(new SensorsAnalyticsTransform(project, extension))
     }
 }

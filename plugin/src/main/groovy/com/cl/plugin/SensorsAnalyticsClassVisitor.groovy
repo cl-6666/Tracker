@@ -7,7 +7,7 @@ import org.objectweb.asm.Opcodes
 
 class SensorsAnalyticsClassVisitor extends ClassVisitor implements Opcodes {
     private final
-    static String SDK_API_CLASS = "com/cl/plugin/sdk/SensorsDataAutoTrackHelper"
+    static String SDK_API_CLASS = "com/cl/tracker_cl/listener/SensorsDataAutoTrackHelper"
     private String[] mInterfaces
     private ClassVisitor classVisitor
 
@@ -96,7 +96,7 @@ class SensorsAnalyticsClassVisitor extends ClassVisitor implements Opcodes {
 
             @Override
             AnnotationVisitor visitAnnotation(String s, boolean b) {
-                if (s == 'Lcom/cl/android/sdk/SensorsDataTrackViewOnClick;') {
+                if (s == 'Lcom/cl/tracker_cl/listener/SensorsDataTrackViewOnClick;') {
                     isSensorsDataTrackViewOnClickAnnotation = true
                 }
 

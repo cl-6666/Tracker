@@ -67,7 +67,7 @@ public class CommonBean implements Serializable {
     /**
      * SDK版本，例如3.1.5
      */
-    private String sdk_version;
+    public static String sdk_version = "1.0.0";
 
     /**
      * 应用的版本，1.3.0
@@ -143,13 +143,22 @@ public class CommonBean implements Serializable {
         network_type = NetworkUtils.networkType(context);
         model = AppUtil.getSystemModel();
         wifi_name = NetworkUtils.getSSID(context);
-        sdk_version = "1.0.0";
         sdk = "android";
         app_name = AppUtil.getAppName(context);
         longitude = (long) SharedPreferencesUtil.getInstance().getParam("latitude", (long) 0);
         latitude = (long) SharedPreferencesUtil.getInstance().getParam("latitude", (long) 0);
         user_id = (String) SharedPreferencesUtil.getInstance().getParam("user_id", "");
     }
+
+    public String getLongitude() {
+        return String.valueOf(longitude);
+    }
+
+
+    public String getLatitude() {
+        return String.valueOf(latitude);
+    }
+
 
     public String getParameters(String sign) {
         StringBuilder builder = new StringBuilder();

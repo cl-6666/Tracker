@@ -4,9 +4,9 @@ import android.app.Application;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.Keep;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
-import android.view.View;
-import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.cl.tracker_cl.bean.CommonBean;
@@ -18,21 +18,27 @@ import com.cl.tracker_cl.http.BaseBean;
 import com.cl.tracker_cl.http.IDataListener;
 import com.cl.tracker_cl.http.PgyHttp;
 import com.cl.tracker_cl.http.UPLOAD_CATEGORY;
+import com.cl.tracker_cl.listener.SensorsDataPrivate;
+import com.cl.tracker_cl.listener.TrackTaskManager;
 import com.cl.tracker_cl.util.LogUtil;
 import com.cl.tracker_cl.util.SharedPreferencesUtil;
 
+import org.json.JSONObject;
 import org.litepal.LitePal;
 import org.litepal.crud.callback.FindMultiCallback;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 
 /**
  * 事件管理
  */
+@Keep
 public class Tracker implements ISensorsDataAPI {
 
+    public static final String SDK_VERSION = "1.0.0";
     private Context mContext;
     private TrackConfiguration config;
     private CommonBean commonInfo;
@@ -40,9 +46,10 @@ public class Tracker implements ISensorsDataAPI {
 
     //需要上传的数据
     private List<TrackerDb> mTrackerDbs = new ArrayList<>();
-
     private final int UPLOAD_EVENT_WHAT = 0xff01;
 
+    //全埋点
+    private static Map<String, Object> mDeviceInfo;
 
     private Handler handler = new Handler() {
         @Override
@@ -65,12 +72,15 @@ public class Tracker implements ISensorsDataAPI {
         return Singleton.instance;
     }
 
+    @Keep
+    @SuppressWarnings("UnusedReturnValue")
     public void init(Application context, TrackConfiguration config) {
         if (config == null) {
             throw new IllegalArgumentException("config can't be null");
         }
         this.mContext = context;
         setTrackerConfig(config);
+        mDeviceInfo = SensorsDataPrivate.getDeviceInfo(context.getApplicationContext());
         commonInfo = new CommonBean(mContext);
         LogUtil.e("公共参数：" + commonInfo.getParameters("sss"));
         SharedPreferencesUtil.getInstance().init(context);
@@ -83,49 +93,33 @@ public class Tracker implements ISensorsDataAPI {
     }
 
     /**
-     * 从服务器请求埋点的配置信息
+     * 通过后台服务实时上传埋点数据
+     *
+     * @param eventInfo
      */
-    private void startRequestConfig() {
+    private void commitRealTimeEvent(EventBean eventInfo) {
 
     }
 
-    /**
-     * 获取需要收集的埋点路径列表
-     *
-     * @param validEventList
-     * @return
-     */
-    private List<String> getValidEventList(List<EventBean> validEventList) {
-        List<String> validEventPathList = new ArrayList<>();
-        if (validEventList != null && validEventList.size() > 0) {
-            for (EventBean event : validEventList) {
-                validEventPathList.add(event.getPath());
+
+    private void trackEvent(final String eventName, final JSONObject properties, final String originalDistinctId) {
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("type", eventName);
+            JSONObject sendProperties = new JSONObject(mDeviceInfo);
+            if (properties != null) {
+                SensorsDataPrivate.mergeJSONObject(properties, sendProperties);
             }
+            jsonObject.put("userData", sendProperties);
+            jsonObject.put("time", System.currentTimeMillis());
+            LogUtil.i("数据:" + SensorsDataPrivate.formatJson(jsonObject.toString()));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return validEventPathList;
-    }
 
-    /**
-     * 添加浏览页面事件
-     *
-     * @param context
-     * @param duration
-     */
-    public void addViewEvent(Context context, long duration) {
-        addEvent(new EventBean(EventBean.generateViewPath(context), duration));
-    }
-
-    /**
-     * 添加点击事件
-     *
-     * @param view
-     */
-    public void addClickEvent(View view) {
-        addEvent(new EventBean(EventBean.generateClickedPath(view)));
     }
 
     private void addEvent(final EventBean eventInfo) {
-
         switch (config.getUploadCategory()) {
             case REAL_TIME:
                 commitRealTimeEvent(eventInfo);
@@ -189,22 +183,10 @@ public class Tracker implements ISensorsDataAPI {
     }
 
     /**
-     * 通过后台服务实时上传埋点数据
-     *
-     * @param eventInfo
-     */
-    private void commitRealTimeEvent(EventBean eventInfo) {
-
-    }
-
-    /**
      * 实时上传埋点数据
      */
-    private synchronized void uploadEventInfo() {
-
-
+    public synchronized void uploadEventInfo() {
     }
-
 
     /**
      * 上传埋点数据
@@ -229,12 +211,6 @@ public class Tracker implements ISensorsDataAPI {
 
     }
 
-    /**
-     * 提交新设备信息到服务器
-     */
-    private void submitDeviceInfo() {
-
-    }
 
     /**
      * 注册事件动态公共属性
@@ -265,6 +241,47 @@ public class Tracker implements ISensorsDataAPI {
         } else {
             SharedPreferencesUtil.getInstance().saveParam("user_id", user_id);
         }
+    }
+
+    /**
+     * Track 事件
+     *
+     * @param eventName  String 事件名称
+     * @param properties JSONObject 事件属性
+     * @param eventName  事件的名称
+     * @param properties 事件的属性
+     */
+    @Override
+    public void track(@NonNull final String eventName, @NonNull final JSONObject properties) {
+        try {
+            trackEvent(eventName, properties, null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void track(final String eventName) {
+        try {
+            trackEvent(eventName, null, null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void trackTimer(String eventName) {
+
+    }
+
+    @Override
+    public void startRequestConfig() {
+
+    }
+
+    @Override
+    public void submitDeviceInfo() {
+
     }
 
     @Override

@@ -5,7 +5,6 @@ import android.app.Application;
 import com.cl.tracker_cl.Tracker;
 import com.cl.tracker_cl.TrackConfiguration;
 import com.cl.tracker_cl.http.UPLOAD_CATEGORY;
-import com.cl.tracker_cl.util.LogUtil;
 
 
 public class MyApp extends Application {

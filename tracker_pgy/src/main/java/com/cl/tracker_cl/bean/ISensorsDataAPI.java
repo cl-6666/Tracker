@@ -1,5 +1,9 @@
 package com.cl.tracker_cl.bean;
 
+import android.support.annotation.NonNull;
+
+import org.json.JSONObject;
+
 /**
  * 项目：Tracker
  * 版权：蒲公英公司 版权所有
@@ -22,11 +26,10 @@ public interface ISensorsDataAPI {
     /**
      * 更新 GPS 位置信息
      *
-     * @param latitude 纬度
+     * @param latitude  纬度
      * @param longitude 经度
      */
     void setGPSLocation(double latitude, double longitude);
-
 
     /**
      * 获取当前用户的 distinctId
@@ -35,7 +38,41 @@ public interface ISensorsDataAPI {
      */
     void getDistinctId(String user_id);
 
+    /**
+     * 调用track接口，追踪一个带有属性的事件
+     *
+     * @param eventName  事件的名称
+     * @param properties 事件的属性
+     */
+    void track(@NonNull String eventName, @NonNull JSONObject properties);
 
+    /**
+     * 与 {@link #track(String, JSONObject)} 类似，无事件属性
+     *
+     * @param eventName 事件的名称
+     */
+    void track(String eventName);
+
+    /**
+     * 初始化事件的计时器，默认计时单位为毫秒。
+     * 详细用法请参考 trackTimer(String, TimeUnit)
+     *
+     * @param eventName 事件的名称
+     */
+    @Deprecated
+    void trackTimer(final String eventName);
+
+
+    /**
+     * 从服务器请求埋点的配置信息
+     */
+    void startRequestConfig();
+
+
+    /**
+     * 提交新设备信息到服务器
+     */
+    void submitDeviceInfo();
 
     /**
      * 是否开启可视化全埋点

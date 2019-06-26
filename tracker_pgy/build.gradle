@@ -29,10 +29,7 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    implementation 'com.google.protobuf:protobuf-lite:3.0.0'
-    implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'org.litepal.android:java:3.0.0'
-    implementation 'org.aspectj:aspectjrt:1.8.1'
     implementation 'com.alibaba:fastjson:1.2.58'
 }
 
