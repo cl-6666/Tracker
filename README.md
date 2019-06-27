@@ -96,3 +96,23 @@
             }
         });
 ```
+
+### 可能遇到的问题  
+```Java
+如果说报了如下的错
+java.io.IOException: Cleartext HTTP traffic to t1pvuv.lechuangtec.com not permitted
+为保证用户数据和设备的安全，Google针对下一代 Android 系统(Android P) 的应用程序，将要求默认使用加密连接，这意味着 Android P 将禁止 App 使用所有未加密的连接，因此运行 Android P 系统的安卓设备无论是接收或者发送流量，未来都不能明码传输，需要使用下一代(Transport Layer Security)传输层安全协议。
+也就是说，如果我们的应用是在Android 9或更高版本为目标平台，则默认情况下，是不支持HTTP明文请求的。
+解决方法有很多举例其一
+<?xml version="1.0" encoding="utf-8"?>
+<manifest ...>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <application
+        ...
+        android:usesCleartextTraffic="true"
+        ...>
+        ...
+    </application>
+</manifest>
+
+```
