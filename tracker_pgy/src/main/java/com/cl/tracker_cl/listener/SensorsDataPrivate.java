@@ -1,13 +1,17 @@
 package com.cl.tracker_cl.listener;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.provider.Settings;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -72,7 +76,7 @@ public class SensorsDataPrivate {
     public static Map<String, Object> getDeviceInfo(Context context) {
         final Map<String, Object> deviceInfo = new HashMap<>();
         {
-            deviceInfo.put("$lib", "Android");
+            deviceInfo.put("lib", "Android");
             deviceInfo.put("device_id", getAndroidID(context));
             deviceInfo.put("network_type", NetworkUtils.networkType(context));
             deviceInfo.put("wifi_name", NetworkUtils.getSSID(context));
@@ -409,4 +413,5 @@ public class SensorsDataPrivate {
             return "";
         }
     }
+
 }

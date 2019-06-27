@@ -1,5 +1,6 @@
 package com.cl.tracker_cl.bean;
 
+import android.app.Activity;
 import android.support.annotation.NonNull;
 
 import org.json.JSONObject;
@@ -62,6 +63,13 @@ public interface ISensorsDataAPI {
     @Deprecated
     void trackTimer(final String eventName);
 
+
+    /**
+     * 获取页面标题
+     *
+     * @param activity
+     */
+    void getActivityTitle(Activity activity);
 
     /**
      * 从服务器请求埋点的配置信息

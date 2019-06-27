@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.cl.tracker_cl.Tracker;
+import com.cl.tracker_cl.bean.SensorsDataDynamicSuperProperties;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -26,7 +27,18 @@ public class OrdinaryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ordinary);
 
-
+        //设置动态公共属性
+        Tracker.getInstance().registerDynamicSuperProperties(new SensorsDataDynamicSuperProperties() {
+            @Override
+            public JSONObject getDynamicSuperProperties() {
+                try {
+                    return new JSONObject().put("isLogin", "反反复复付付付付付付");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+        });
     }
 
     public void onBtn1(View view) throws JSONException {
@@ -34,7 +46,7 @@ public class OrdinaryActivity extends AppCompatActivity {
         properties.put("ProductID", 123456);                    // 设置商品ID
         properties.put("ProductCatalog", "Laptop Computer");    // 设置商品类别
         properties.put("IsAddedToFav", false);
-        Tracker.getInstance().track("Button", properties);
+        Tracker.getInstance().getTitle(this).track("Button", properties);
 
     }
 
