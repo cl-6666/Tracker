@@ -9,6 +9,7 @@ import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
+import com.alibaba.fastjson.JSON;
 import com.cl.tracker_cl.bean.EventBean;
 import com.cl.tracker_cl.bean.ISensorsDataAPI;
 import com.cl.tracker_cl.bean.SensorsDataDynamicSuperProperties;
@@ -23,6 +24,8 @@ import com.cl.tracker_cl.util.SensorsDataUtils;
 import com.cl.tracker_cl.util.SharedPreferencesUtil;
 
 import org.json.JSONObject;
+import org.litepal.LitePal;
+import org.litepal.crud.callback.FindMultiCallback;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -141,18 +144,93 @@ public class Tracker implements ISensorsDataAPI {
     }
 
 
-    private void trackEvent(final String eventName, final JSONObject properties, final String originalDistinctId) {
+    private void trackEvent(final String eventName, final JSONObject properties) {
+        /**
+         * 格式格式一
+         * {
+         *     	"type":"Button",
+         *     	"userData":{
+         *     		"screen_width":1080,
+         *     		"lib":"Android",
+         *     		"device_id":"181d7570b925d50a",
+         *     		"os":"Android",
+         *     		"app_version":"1.0",
+         *     		"os_version":"9",
+         *     		"manufacturer":"HUAWEI",
+         *     		"app_name":"My Application",
+         *     		"screen_height":2159,
+         *     		"wifi_name":"",
+         *     		"sdk_version":"1.0.0",
+         *     		"model":"EML-AL00",
+         *     		"sdk":"Android",
+         *     		"network_type":"WIFI",
+         *     		"title":"My Application",
+         *     		"ProductID":123456,
+         *     		"ProductCatalog":"Laptop Computer",
+         *     		"IsAddedToFav":false
+         *                },
+         *     	"time":1561608401107
+         *     }
+         */
+//        JSONObject jsonObject = new JSONObject();
+//        try {
+//            jsonObject.put("type", eventName);
+//            JSONObject sendProperties = new JSONObject(mDeviceInfo);
+//            sendProperties.put("title", mActivityTitle);
+//            if (properties != null) {
+//                SensorsDataPrivate.mergeJSONObject(properties, sendProperties);
+//            }
+//            jsonObject.put("userData", sendProperties);
+//            jsonObject.put("time", System.currentTimeMillis());
+//            LogUtil.i("数据:" + SensorsDataPrivate.formatJson(jsonObject.toString()));
+//
+//            LogUtil.i("新格式:" + SensorsDataPrivate.formatJson(sendProperties.toString()));
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+
+        /**
+         * 数据格式二
+         * {
+         *     	"screen_width":1080,
+         *     	"lib":"Android",
+         *     	"device_id":"181d7570b925d50a",
+         *     	"os":"Android",
+         *     	"app_version":"1.0",
+         *     	"os_version":"9",
+         *     	"manufacturer":"HUAWEI",
+         *     	"app_name":"My Application",
+         *     	"screen_height":2159,
+         *     	"wifi_name":"",
+         *     	"sdk_version":"1.0.0",
+         *     	"model":"EML-AL00",
+         *     	"sdk":"Android",
+         *     	"network_type":"WIFI",
+         *     	"title":"My Application",
+         *     	"ProductID":123456,
+         *     	"ProductCatalog":"Laptop Computer",
+         *     	"IsAddedToFav":false,
+         *     	"attributes":{
+         *     		"type":"Button",
+         *     		"time":1561608684746
+         *                }
+         *     }
+         */
         try {
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("type", eventName);
+//            jsonObject.put("eventCode", eventName);
+            jsonObject.put("time", System.currentTimeMillis());
             JSONObject sendProperties = new JSONObject(mDeviceInfo);
             sendProperties.put("title", mActivityTitle);
             if (properties != null) {
                 SensorsDataPrivate.mergeJSONObject(properties, sendProperties);
             }
-            jsonObject.put("userData", sendProperties);
-            jsonObject.put("time", System.currentTimeMillis());
-            LogUtil.i("数据:" + SensorsDataPrivate.formatJson(jsonObject.toString()));
+            sendProperties.put("attributes", jsonObject);
+            sendProperties.put("eventCode", eventName);
+            sendProperties.put("user_id", SharedPreferencesUtil.getInstance().getParam("user_id", ""));
+            LogUtil.i("数据:" + SensorsDataPrivate.formatJson(sendProperties.toString()));
+            addEvent(eventName, SensorsDataPrivate.formatJson(sendProperties.toString()));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -168,11 +246,9 @@ public class Tracker implements ISensorsDataAPI {
         } catch (Exception e) {
             LogUtil.printStackTrace(e);
         }
-
-        addEvent();
     }
 
-    private void addEvent() {
+    private void addEvent(String eventName, String s) {
         switch (config.getUploadCategory()) {
             case REAL_TIME:
                 commitRealTimeEvent();
@@ -180,7 +256,7 @@ public class Tracker implements ISensorsDataAPI {
 
             case NEXT_CACHE:
                 //存数据库
-//                addData(eventInfo);
+                addData(eventName, s);
                 break;
 
             default:
@@ -192,28 +268,26 @@ public class Tracker implements ISensorsDataAPI {
     /**
      * 使用缓存处理方式上传
      *
-     * @param eventInfo
+     * @param eventName
+     * @param s
      */
-    private void addData(EventBean eventInfo) {
-//        String str_json = JSON.toJSONString(); //
-//        LogUtil.e("实体转化为Json" + str_json);
-//        LogUtil.e("EventBean:" + eventInfo.toString());
-//        mTrackerDbs.add(new TrackerDb("点击测试事件", str_json, String.valueOf(eventInfo.getEventTime())));
-//        //每10条入一次库
-//        if (mTrackerDbs.size() == 10) {
-//            LitePal.saveAll(mTrackerDbs);
-//            mTrackerDbs.removeAll(mTrackerDbs);
-//        }
-//        LogUtil.e("条数:" + mTrackerDbs.size());
-//        // 异步查询示例
-//        LitePal.findAllAsync(TrackerDb.class).listen(new FindMultiCallback<TrackerDb>() {
-//            @Override
-//            public void onFinish(List<TrackerDb> allSongs) {
-//                LogUtil.e("数据库条数：" + allSongs.size());
-////                if (allSongs.size() < 100) return;
-//                realUploadEventInfo(allSongs);
-//            }
-//        });
+    private void addData(String eventName, String s) {
+        mTrackerDbs.add(new TrackerDb(eventName, s, String.valueOf(System.currentTimeMillis())));
+        //每5条入一次库
+        if (mTrackerDbs.size() == 5) {
+            LitePal.saveAll(mTrackerDbs);
+            mTrackerDbs.removeAll(mTrackerDbs);
+        }
+        LogUtil.e("条数:" + mTrackerDbs.size());
+        // 异步查询示例
+        LitePal.findAllAsync(TrackerDb.class).listen(new FindMultiCallback<TrackerDb>() {
+            @Override
+            public void onFinish(List<TrackerDb> allSongs) {
+                LogUtil.e("数据库条数：" + allSongs.size());
+                if (allSongs.size() < 10) return;
+                realUploadEventInfo(allSongs);
+            }
+        });
 
     }
 
@@ -231,12 +305,12 @@ public class Tracker implements ISensorsDataAPI {
      */
     private void realUploadEventInfo(List<TrackerDb> allSongs) {
         LogUtil.e("URL:" + config.getServerUrl());
-        //Student为自己定义的javaBean
-        PgyHttp.sendJsonRequest(allSongs, config.getServerUrl(), BaseBean.class, new IDataListener<BaseBean>() {
+        LogUtil.e("数据:" + allSongs.toString());
+        PgyHttp.sendJsonRequest(allSongs.toString(), config.getServerUrl(), BaseBean.class, new IDataListener<BaseBean>() {
             @Override
             public void onSuccess(BaseBean student) {
-                LogUtil.e("成功");
-
+                LogUtil.e("成功:" + student.toString());
+                LitePal.deleteAll(TrackerDb.class);
             }
 
             @Override
@@ -244,7 +318,6 @@ public class Tracker implements ISensorsDataAPI {
                 LogUtil.e("失败");
             }
         });
-
     }
 
 
@@ -290,7 +363,7 @@ public class Tracker implements ISensorsDataAPI {
     @Override
     public void track(@NonNull final String eventName, @NonNull final JSONObject properties) {
         try {
-            trackEvent(eventName, properties, null);
+            trackEvent(eventName, properties);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -299,7 +372,7 @@ public class Tracker implements ISensorsDataAPI {
     @Override
     public void track(final String eventName) {
         try {
-            trackEvent(eventName, null, null);
+            trackEvent(eventName, null);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -335,6 +408,12 @@ public class Tracker implements ISensorsDataAPI {
     }
 
 
+    /**
+     * 考虑可有可无
+     *
+     * @param activity
+     * @return
+     */
     public Tracker getTitle(Activity activity) {
         getActivityTitle(activity);
         return this;

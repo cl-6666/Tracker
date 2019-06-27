@@ -13,7 +13,7 @@ public class MyApp extends Application {
     /**
      * 采集数据的地址
      */
-    private final static String SA_SERVER_URL = "https://sdkdebugtest.datasink.sensorsdata.cn/sa?project=default&token=cfb8b60e42e0ae9b";
+    private final static String SA_SERVER_URL = "http://t1pvuv.lechuangtec.com/api/point/insert";
 
 
     @Override
