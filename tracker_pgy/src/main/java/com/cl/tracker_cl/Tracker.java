@@ -230,7 +230,7 @@ public class Tracker implements ISensorsDataAPI {
             sendProperties.put("eventCode", eventName);
             sendProperties.put("user_id", SharedPreferencesUtil.getInstance().getParam("user_id", ""));
             LogUtil.i("数据:" + SensorsDataPrivate.formatJson(sendProperties.toString()));
-            addEvent(eventName, SensorsDataPrivate.formatJson(sendProperties.toString()));
+//            addEvent(eventName, SensorsDataPrivate.formatJson(sendProperties.toString()));
         } catch (Exception e) {
             e.printStackTrace();
         }
