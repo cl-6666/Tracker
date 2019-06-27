@@ -3,43 +3,10 @@
 在这里非常感谢神策平台给我带来了灵感编写了这样一个sdk,当然有很多需要完善的部分,我会继续维护下去直到完美，有问题欢迎留言.
 
 ### 埋点库里内部自动封装了一些公共参数  
+![公共参数说明](http://47.96.120.196/img1.png)  
+![公共参数说明](http://47.96.120.196/img2.png)  
+![公共参数说明](http://47.96.120.196/img3.png)
 ```Java
-id	bigint 主键，自增
-event_code varchar(32)	事件编码
-device_id varchar(32)	设备ID
-user_id varchar(32)	用户ID
-ip	varchar(64)	IP
-country varchar(32)	国家，不传时通过IP解析
-province	varchar(32)	省份，不传时通过IP解析
-city varchar(32)	城市，不传时通过IP解析
-app_version	varchar(32)	应用的版本，130，去除小数点
-network_type varchar(32)	网络类型，例如4G
-wifi_name varchar(32)	wifi名称
-screen_width int	屏幕宽度
-screen_height int	屏幕高度
-os	varchar(32)	操作系统，例如 ios
-os_version varchar(32)	操作系统版本，例如 811，去除小数点
-browser varchar(32)	浏览器名，例如Chrome
-browser_version varchar(32)	浏览器版本，例如Chrome 45
-sdk varchar(32)	SDK类型，例如android，ios，java，javascript等
-sdk_version	varchar(32)	SDK版本
-manufacturer varchar(32)	设备制造商，例如 Apple
-model	varchar(32)	设备型号，例如 iphone6
-project	varchar(32)	这条数据所属项目名，若不指定该参数，则需要使用该字段时取值 default，即默认项目。
-user_agent	varchar(128)	浏览器User-Agent字符串，识别客户使用的操作系统及版本、CPU 类型、浏览器及版本、浏览器渲染引擎、浏览器语言、浏览器插件等。
-channel	varchar(32)	渠道编码
-gmt_time	timestamp(3)	时间，精确到毫秒
-attributes  varchar	事件的具体属性，自定义属性，JSON格式，不能与系统预设字段同名
-
-
-distinct_id	bigint	标识ID
-device_id	varchar	设备ID
-user_id	varchar	业务用户唯一标识
-device_id_list	varchar	设备ID组
-wx_openid	varchar	微信openid
-wx_unionid	varchar	微信unionid，绑定开放平台才有
-status	boolean	有效状态：【1：有效，0：无效】
-
 {
     "eventCode":"register_register_button_ck",
     "deviceId":"CA0AA7D817A33D4E7CFF",
