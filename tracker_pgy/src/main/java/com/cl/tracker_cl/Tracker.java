@@ -9,8 +9,6 @@ import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
-import com.alibaba.fastjson.JSON;
-import com.cl.tracker_cl.bean.EventBean;
 import com.cl.tracker_cl.bean.ISensorsDataAPI;
 import com.cl.tracker_cl.bean.SensorsDataDynamicSuperProperties;
 import com.cl.tracker_cl.db.TrackerDb;
@@ -230,7 +228,7 @@ public class Tracker implements ISensorsDataAPI {
             sendProperties.put("eventCode", eventName);
             sendProperties.put("user_id", SharedPreferencesUtil.getInstance().getParam("user_id", ""));
             LogUtil.i("数据:" + SensorsDataPrivate.formatJson(sendProperties.toString()));
-//            addEvent(eventName, SensorsDataPrivate.formatJson(sendProperties.toString()));
+            addEvent(eventName, SensorsDataPrivate.formatJson(sendProperties.toString()));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -274,7 +272,7 @@ public class Tracker implements ISensorsDataAPI {
     private void addData(String eventName, String s) {
         mTrackerDbs.add(new TrackerDb(eventName, s, String.valueOf(System.currentTimeMillis())));
         //每5条入一次库
-        if (mTrackerDbs.size() == 5) {
+        if (mTrackerDbs.size() == 10) {
             LitePal.saveAll(mTrackerDbs);
             mTrackerDbs.removeAll(mTrackerDbs);
         }
@@ -305,8 +303,10 @@ public class Tracker implements ISensorsDataAPI {
      */
     private void realUploadEventInfo(List<TrackerDb> allSongs) {
         LogUtil.e("URL:" + config.getServerUrl());
-        LogUtil.e("数据:" + allSongs.toString());
-        PgyHttp.sendJsonRequest(allSongs.toString(), config.getServerUrl(), BaseBean.class, new IDataListener<BaseBean>() {
+        //拼接一下即可
+        String data = "{\"pointList\":" + allSongs.toString() + "}";
+        LogUtil.e("数据:" + data);
+        PgyHttp.sendJsonRequest(data, config.getServerUrl(), BaseBean.class, new IDataListener<BaseBean>() {
             @Override
             public void onSuccess(BaseBean student) {
                 LogUtil.e("成功:" + student.toString());

@@ -1,5 +1,7 @@
 package com.cl.tracker_cl.http;
 
+import com.cl.tracker_cl.util.LogUtil;
+
 import java.io.BufferedOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -72,6 +74,7 @@ public class JsonHttpRequest implements IHttpRequest {
             out.close();
             bos.close();
 
+            LogUtil.e("code码:" + urlConnection.getResponseCode());
             //获得服务器响应
             if (urlConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
                 InputStream in = urlConnection.getInputStream();

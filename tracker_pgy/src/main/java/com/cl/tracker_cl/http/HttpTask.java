@@ -1,7 +1,5 @@
 package com.cl.tracker_cl.http;
 
-import com.alibaba.fastjson.JSON;
-
 import java.io.UnsupportedEncodingException;
 
 /**
@@ -27,7 +25,7 @@ public class HttpTask<T> implements Runnable {
         //设置请求参数
         if (requestInfo != null) {
             //将用户发送的请求参数对象转换成字符串
-            String requestContent = JSON.toJSONString(requestInfo);
+            String requestContent = (String) requestInfo;
             //字符串转byte数组
             try {
                 this.httpRequest.setRequestData(requestContent.getBytes("utf-8"));

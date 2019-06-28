@@ -1,10 +1,12 @@
 package com.cl.tracker_cl.http;
 
 
+import java.io.Serializable;
+
 /**
  * 实体类的基类
  */
-public class BaseBean {
+public class BaseBean<T> implements Serializable {
 
     /**
      * code : 0
@@ -14,7 +16,7 @@ public class BaseBean {
 
     private int code;
     private String msg;
-    private String data;
+    private T data;
 
 
     @Override
@@ -42,11 +44,11 @@ public class BaseBean {
         this.msg = msg;
     }
 
-    public Object getData() {
+    public T getData() {
         return data;
     }
 
-    public void setData(String data) {
+    public void setData(T data) {
         this.data = data;
     }
 }
