@@ -15,7 +15,6 @@ import com.cl.tracker_cl.db.TrackerDb;
 import com.cl.tracker_cl.http.BaseBean;
 import com.cl.tracker_cl.http.IDataListener;
 import com.cl.tracker_cl.http.PgyHttp;
-import com.cl.tracker_cl.http.UPLOAD_CATEGORY;
 import com.cl.tracker_cl.listener.SensorsDataPrivate;
 import com.cl.tracker_cl.util.LogUtil;
 import com.cl.tracker_cl.util.SensorsDataUtils;
@@ -60,11 +59,8 @@ public class Tracker implements ISensorsDataAPI {
             super.handleMessage(msg);
             if (msg.what == UPLOAD_EVENT_WHAT) {
                 uploadEventInfo();
-                if (config.getUploadCategory() != UPLOAD_CATEGORY.NEXT_LAUNCH) {
-                    handler.sendEmptyMessageDelayed(UPLOAD_EVENT_WHAT, config.getUploadCategory().getValue() * 1000);
-                }
             } else if (msg.what == TIMER_WHAT) {
-                LogUtil.e("计时器任务开启了");
+                uploadEventInfo();
             }
         }
     };
@@ -73,9 +69,7 @@ public class Tracker implements ISensorsDataAPI {
     //时间任务
     private TimerTask task = new TimerTask() {
         public void run() {
-            Message msg = new Message();
-            msg.what = TIMER_WHAT;
-            handler.sendMessage(msg);
+            handler.sendEmptyMessage(TIMER_WHAT);
         }
     };
 
@@ -119,7 +113,7 @@ public class Tracker implements ISensorsDataAPI {
                 break;
 
             case NEXT_LAUNCH:
-
+                handler.sendEmptyMessage(UPLOAD_EVENT_WHAT);
                 break;
 
             default:
@@ -132,13 +126,6 @@ public class Tracker implements ISensorsDataAPI {
         if (config != null) {
             this.config = config;
         }
-    }
-
-    /**
-     * 通过后台服务实时上传埋点数据
-     */
-    private void commitRealTimeEvent() {
-
     }
 
 
@@ -215,14 +202,25 @@ public class Tracker implements ISensorsDataAPI {
          *                }
          *     }
          */
+        JSONObject jsonObject = new JSONObject();
+        JSONObject sendProperties = new JSONObject(mDeviceInfo);
         try {
-            JSONObject jsonObject = new JSONObject();
-//            jsonObject.put("eventCode", eventName);
+            if (mDynamicSuperProperties != null) {
+                JSONObject dynamicSuperProperties = mDynamicSuperProperties.getDynamicSuperProperties();
+                if (dynamicSuperProperties != null) {
+                    SensorsDataUtils.mergeJSONObject(dynamicSuperProperties, sendProperties);
+                    LogUtil.i("公共数据:" + SensorsDataPrivate.formatJson(dynamicSuperProperties.toString()));
+
+                }
+            }
+        } catch (Exception e) {
+            LogUtil.printStackTrace(e);
+        }
+        try {
             jsonObject.put("time", System.currentTimeMillis());
-            JSONObject sendProperties = new JSONObject(mDeviceInfo);
             sendProperties.put("title", mActivityTitle);
             if (properties != null) {
-                SensorsDataPrivate.mergeJSONObject(properties, sendProperties);
+                SensorsDataPrivate.mergeJSONObject(properties, jsonObject);
             }
             sendProperties.put("attributes", jsonObject);
             sendProperties.put("eventCode", eventName);
@@ -233,30 +231,22 @@ public class Tracker implements ISensorsDataAPI {
             e.printStackTrace();
         }
 
-        try {
-            if (mDynamicSuperProperties != null) {
-                JSONObject dynamicSuperProperties = mDynamicSuperProperties.getDynamicSuperProperties();
-                if (dynamicSuperProperties != null) {
-                    SensorsDataUtils.mergeJSONObject(dynamicSuperProperties, properties);
-                    LogUtil.i("公共数据:" + SensorsDataPrivate.formatJson(dynamicSuperProperties.toString()));
-                }
-            }
-        } catch (Exception e) {
-            LogUtil.printStackTrace(e);
-        }
     }
 
     private void addEvent(String eventName, String s) {
         switch (config.getUploadCategory()) {
             case REAL_TIME:
-                commitRealTimeEvent();
+                commitRealTimeEvent(eventName, s);
                 break;
-
             case NEXT_CACHE:
                 //存数据库
-                addData(eventName, s);
+                addData(eventName, s, UPLOAD_EVENT_WHAT);
                 break;
-
+            case NEXT_15_MINUTER:
+            case NEXT_30_MINUTER:
+            case NEXT_LAUNCH:
+                addData(eventName, s, TIMER_WHAT);
+                break;
             default:
 
                 break;
@@ -269,20 +259,20 @@ public class Tracker implements ISensorsDataAPI {
      * @param eventName
      * @param s
      */
-    private void addData(String eventName, String s) {
+    private void addData(String eventName, String s, int type) {
         mTrackerDbs.add(new TrackerDb(eventName, s, String.valueOf(System.currentTimeMillis())));
         //每5条入一次库
-        if (mTrackerDbs.size() == 10) {
+        if (mTrackerDbs.size() == 5) {
             LitePal.saveAll(mTrackerDbs);
             mTrackerDbs.removeAll(mTrackerDbs);
         }
-        LogUtil.e("条数:" + mTrackerDbs.size());
+        if (type == TIMER_WHAT) return;
         // 异步查询示例
         LitePal.findAllAsync(TrackerDb.class).listen(new FindMultiCallback<TrackerDb>() {
             @Override
             public void onFinish(List<TrackerDb> allSongs) {
                 LogUtil.e("数据库条数：" + allSongs.size());
-                if (allSongs.size() < 10) return;
+                if (allSongs.size() < config.getmFlushBulkSize()) return;
                 realUploadEventInfo(allSongs);
             }
         });
@@ -290,14 +280,59 @@ public class Tracker implements ISensorsDataAPI {
     }
 
     /**
-     * 实时上传埋点数据
+     * 上传埋点数据每次启动的时候执行
      */
-    public synchronized void uploadEventInfo() {
+    public void uploadEventInfo() {
+        // 异步查询示例
+        LitePal.findAllAsync(TrackerDb.class).listen(new FindMultiCallback<TrackerDb>() {
+            @Override
+            public void onFinish(List<TrackerDb> allSongs) {
+                if (allSongs.size() == 0) return;
+                String data = "{\"pointList\":" + allSongs.toString() + "}";
+                PgyHttp.sendJsonRequest(data, config.getServerUrl(), BaseBean.class, new IDataListener<BaseBean>() {
+                    @Override
+                    public void onSuccess(BaseBean student) {
+                        LogUtil.e("成功:" + student.toString());
+                        LitePal.deleteAll(TrackerDb.class);
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        LogUtil.e("失败");
+                    }
+                });
+            }
+        });
 
     }
 
+
     /**
-     * 上传埋点数据
+     * 实时上传埋点数据
+     *
+     * @param eventName
+     * @param s
+     */
+    private void commitRealTimeEvent(String eventName, String s) {
+        mTrackerDbs.add(new TrackerDb(eventName, s, String.valueOf(System.currentTimeMillis())));
+        String data = "{\"pointList\":" + mTrackerDbs.toString() + "}";
+//        LogUtil.e("实时上传数据：" + data);
+        PgyHttp.sendJsonRequest(data, config.getServerUrl(), BaseBean.class, new IDataListener<BaseBean>() {
+            @Override
+            public void onSuccess(BaseBean student) {
+                LogUtil.e("成功:" + student.toString());
+                LitePal.deleteAll(TrackerDb.class);
+            }
+
+            @Override
+            public void onFailure() {
+                LogUtil.e("失败");
+            }
+        });
+    }
+
+    /**
+     * 缓存上传埋点数据
      *
      * @param allSongs
      */
@@ -305,7 +340,7 @@ public class Tracker implements ISensorsDataAPI {
         LogUtil.e("URL:" + config.getServerUrl());
         //拼接一下即可
         String data = "{\"pointList\":" + allSongs.toString() + "}";
-        LogUtil.e("数据:" + data);
+//        LogUtil.e("数据:" + data);
         PgyHttp.sendJsonRequest(data, config.getServerUrl(), BaseBean.class, new IDataListener<BaseBean>() {
             @Override
             public void onSuccess(BaseBean student) {

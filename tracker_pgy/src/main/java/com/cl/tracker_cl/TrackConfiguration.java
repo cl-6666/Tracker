@@ -45,7 +45,7 @@ public class TrackConfiguration {
      */
     private String deviceInfo;
 
-    private int mFlushBulkSize = 100;
+    private int mFlushBulkSize = 10;
 
     /**
      * 设置本地缓存最多事件条数，默认为 10000 条

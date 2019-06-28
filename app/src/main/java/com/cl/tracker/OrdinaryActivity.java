@@ -28,17 +28,21 @@ public class OrdinaryActivity extends AppCompatActivity {
         setContentView(R.layout.activity_ordinary);
 
         //设置动态公共属性
-        Tracker.getInstance().registerDynamicSuperProperties(new SensorsDataDynamicSuperProperties() {
-            @Override
-            public JSONObject getDynamicSuperProperties() {
-                try {
-                    return new JSONObject().put("isLogin", "反反复复付付付付付付");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                return null;
-            }
-        });
+//        Tracker.getInstance().registerDynamicSuperProperties(new SensorsDataDynamicSuperProperties() {
+//            @Override
+//            public JSONObject getDynamicSuperProperties() {
+//                try {
+//                    return new JSONObject().put("publicData1", "公共数据1")
+//                            .put("publicData2", "公共数据2")
+//                            .put("publicData3", "公共数据3")
+//                            .put("publicData4", "公共数据4");
+//
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//                return null;
+//            }
+//        });
     }
 
     public void onBtn1(View view) throws JSONException {
@@ -46,7 +50,7 @@ public class OrdinaryActivity extends AppCompatActivity {
         properties.put("ProductID", 123456);                    // 设置商品ID
         properties.put("ProductCatalog", "Laptop Computer");    // 设置商品类别
         properties.put("IsAddedToFav", false);
-        Tracker.getInstance().getTitle(this).track("Button", properties);
+        Tracker.getInstance().getTitle(this).track("Button",properties);
 
     }
 
