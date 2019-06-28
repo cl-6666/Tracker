@@ -38,21 +38,17 @@ import java.util.TimerTask;
 public class Tracker implements ISensorsDataAPI {
 
     public static final String SDK_VERSION = "1.0.0";
+    //全埋点
+    private static Map<String, Object> mDeviceInfo;
+    private final int UPLOAD_EVENT_WHAT = 1;
+    private final int TIMER_WHAT = 2;   //计时器
     private Context mContext;
     private TrackConfiguration config;
     private SensorsDataDynamicSuperProperties mDynamicSuperProperties;
     private Timer mTimer = new Timer(true);
     private String mActivityTitle;
-
-
     //需要上传的数据
     private List<TrackerDb> mTrackerDbs = new ArrayList<>();
-    private final int UPLOAD_EVENT_WHAT = 1;
-    private final int TIMER_WHAT = 2;   //计时器
-
-    //全埋点
-    private static Map<String, Object> mDeviceInfo;
-
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -217,14 +213,16 @@ public class Tracker implements ISensorsDataAPI {
             LogUtil.printStackTrace(e);
         }
         try {
-            jsonObject.put("time", System.currentTimeMillis());
-            sendProperties.put("title", mActivityTitle);
+            sendProperties.put("eventCode", eventName);
+            if (!TextUtils.isEmpty(mActivityTitle)) {
+                sendProperties.put("title", mActivityTitle);
+            }
             if (properties != null) {
                 SensorsDataPrivate.mergeJSONObject(properties, jsonObject);
             }
             sendProperties.put("attributes", jsonObject);
-            sendProperties.put("eventCode", eventName);
-            sendProperties.put("user_id", SharedPreferencesUtil.getInstance().getParam("user_id", ""));
+            sendProperties.put("timeMillis", System.currentTimeMillis());
+            sendProperties.put("userId", SharedPreferencesUtil.getInstance().getParam("user_id", ""));
             LogUtil.i("数据:" + SensorsDataPrivate.formatJson(sendProperties.toString()));
             addEvent(eventName, SensorsDataPrivate.formatJson(sendProperties.toString()));
         } catch (Exception e) {
@@ -438,11 +436,6 @@ public class Tracker implements ISensorsDataAPI {
         return false;
     }
 
-    public static class Singleton {
-        private final static Tracker instance = new Tracker();
-    }
-
-
     /**
      * 考虑可有可无
      *
@@ -452,6 +445,10 @@ public class Tracker implements ISensorsDataAPI {
     public Tracker getTitle(Activity activity) {
         getActivityTitle(activity);
         return this;
+    }
+
+    public static class Singleton {
+        private final static Tracker instance = new Tracker();
     }
 
 }

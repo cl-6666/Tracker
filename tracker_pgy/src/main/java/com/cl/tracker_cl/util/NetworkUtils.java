@@ -10,6 +10,7 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.telephony.TelephonyManager;
+import android.text.TextUtils;
 
 
 public class NetworkUtils {
@@ -135,8 +136,16 @@ public class NetworkUtils {
                 }
             }
         }
-        return "";
+        // 解决 8.0 9.0 系统中获取 wifiName 为 "unknown ssid" 问题
+        // 9.0 系统，需要GPS权限才可以正确获取到WIFI名称
+        ConnectivityManager cm = (ConnectivityManager) context.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm != null) {
+            NetworkInfo wifiInfo = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+            String s = wifiInfo.getExtraInfo();
+            if (s.length() > 2 && s.charAt(0) == '"' && s.charAt(s.length() - 1) == '"') {
+                return s.substring(1, s.length() - 1);
+            }
+        }
+        return "UNKNOWN";
     }
-
-
 }

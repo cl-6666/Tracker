@@ -1,18 +1,19 @@
 package com.cl.tracker_cl.listener;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
-import android.app.ActionBar;
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.ContextWrapper;
-import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.provider.Settings;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.SwitchCompat;
+import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.View;
@@ -29,9 +30,8 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.cl.tracker_cl.Tracker;
-import com.cl.tracker_cl.bean.CommonBean;
+import com.cl.tracker_cl.util.MD5Util;
 import com.cl.tracker_cl.util.NetworkUtils;
-import com.cl.tracker_cl.util.SharedPreferencesUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -43,6 +43,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
+
+import static android.content.Context.TELEPHONY_SERVICE;
 
 /**
  * 项目：Tracker
@@ -77,13 +80,13 @@ public class SensorsDataPrivate {
         final Map<String, Object> deviceInfo = new HashMap<>();
         {
             deviceInfo.put("lib", "Android");
-            deviceInfo.put("device_id", getAndroidID(context));
-            deviceInfo.put("network_type", NetworkUtils.networkType(context));
-            deviceInfo.put("wifi_name", NetworkUtils.getSSID(context));
-            deviceInfo.put("sdk_version", Tracker.SDK_VERSION);
+            deviceInfo.put("deviceId", getAndroidID(context));
+            deviceInfo.put("networkType", NetworkUtils.networkType(context));
+            deviceInfo.put("wifiName", NetworkUtils.getSSID(context));
+            deviceInfo.put("sdkVersion", Tracker.SDK_VERSION);
             deviceInfo.put("sdk", "Android");
             deviceInfo.put("os", "Android");
-            deviceInfo.put("os_version",
+            deviceInfo.put("osVersion",
                     Build.VERSION.RELEASE == null ? "UNKNOWN" : Build.VERSION.RELEASE);
             deviceInfo
                     .put("manufacturer", Build.MANUFACTURER == null ? "UNKNOWN" : Build.MANUFACTURER);
@@ -96,17 +99,17 @@ public class SensorsDataPrivate {
             try {
                 final PackageManager manager = context.getPackageManager();
                 final PackageInfo packageInfo = manager.getPackageInfo(context.getPackageName(), 0);
-                deviceInfo.put("app_version", packageInfo.versionName);
+                deviceInfo.put("appVersion", packageInfo.versionName);
 
                 int labelRes = packageInfo.applicationInfo.labelRes;
-                deviceInfo.put("app_name", context.getResources().getString(labelRes));
+                deviceInfo.put("project", context.getResources().getString(labelRes));
             } catch (final Exception e) {
                 e.printStackTrace();
             }
 
             final DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
-            deviceInfo.put("screen_height", displayMetrics.heightPixels);
-            deviceInfo.put("screen_width", displayMetrics.widthPixels);
+            deviceInfo.put("screenHeight", displayMetrics.heightPixels);
+            deviceInfo.put("screenWidth", displayMetrics.widthPixels);
 
             return Collections.unmodifiableMap(deviceInfo);
         }
@@ -127,6 +130,105 @@ public class SensorsDataPrivate {
             e.printStackTrace();
         }
         return androidID;
+    }
+
+    /**
+     * 获取 设备ID
+     *
+     * @param mContext Context
+     * @return String
+     */
+    @SuppressLint("MissingPermission")
+    public static String getDeviceID(Context mContext) {
+        String deviceId = "";
+        TelephonyManager tm = (TelephonyManager) mContext.getSystemService(TELEPHONY_SERVICE);
+        if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
+            deviceId = tm.getDeviceId();
+            if (TextUtils.isEmpty(deviceId) || deviceId.length() <= 5) {
+                deviceId = generateUniqueDeviceId(mContext);
+            }
+            return deviceId;
+        } else {
+            deviceId = generateUniqueDeviceId(mContext);
+        }
+        return deviceId;
+    }
+
+    /**
+     * 生成设备唯一标识：IMEI、AndroidId、macAddress 三者拼接再 MD5
+     */
+    private static String generateUniqueDeviceId(Context context) {
+        String androidId = "";
+        String macAddress = "";
+        String hardwareId = "";
+
+        ContentResolver contentResolver = context.getContentResolver();
+        if (contentResolver != null) {
+            androidId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID);
+        }
+
+        WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        if (wifiManager != null) {
+            macAddress = wifiManager.getConnectionInfo().getMacAddress();
+        }
+
+        //根据手机硬件信息获取hardwareId
+        hardwareId = getHardwareDeviceId();
+
+        StringBuilder longIdBuilder = new StringBuilder();
+        if (!TextUtils.isEmpty(androidId)) {
+            longIdBuilder.append(androidId);
+        }
+        if (!TextUtils.isEmpty(macAddress)) {
+            longIdBuilder.append(macAddress);
+        }
+        if (!TextUtils.isEmpty(hardwareId)) {
+            longIdBuilder.append(hardwareId);
+        }
+        //生成md5的值
+        String deviceId = MD5Util.getMD5Str(longIdBuilder.toString());
+        if (TextUtils.isEmpty(deviceId)) {
+            deviceId = UUID.randomUUID().toString()
+                    .replace("-", "")
+                    .replace(" ", "");
+        }
+        return deviceId;
+    }
+
+    /**
+     * 获得HardwareDeviceId
+     *
+     * @return
+     */
+    private static String getHardwareDeviceId() {
+        String serial = "";
+        String hardwareDeviceId;
+        String devIDShort = "35" +
+                Build.BOARD.length() % 10 +
+                Build.BRAND.length() % 10 +
+                Build.CPU_ABI.length() % 10 +
+                Build.DEVICE.length() % 10 +
+                Build.DISPLAY.length() % 10 +
+                Build.HOST.length() % 10 +
+                Build.ID.length() % 10 +
+                Build.MANUFACTURER.length() % 10 +
+                Build.MODEL.length() % 10 +
+                Build.PRODUCT.length() % 10 +
+                Build.TAGS.length() % 10 +
+                Build.TYPE.length() % 10 +
+                Build.USER.length() % 10; //13 位
+        try {
+            serial = Build.class.getField("SERIAL").get(null).toString();
+            //API>=9 使用serial号
+            hardwareDeviceId = new UUID(devIDShort.hashCode(), serial.hashCode()).toString();
+            return hardwareDeviceId.replace("-", "");
+        } catch (Exception exception) {
+            //serial需要一个初始化
+            serial = "serial"; // 随便一个初始化
+        }
+        //使用硬件信息拼凑出来的15位号码
+        hardwareDeviceId = new UUID(devIDShort.hashCode(), serial.hashCode()).toString();
+        return hardwareDeviceId.replace("-", "");
     }
 
     /**
