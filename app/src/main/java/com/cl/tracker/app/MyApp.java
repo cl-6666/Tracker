@@ -30,6 +30,8 @@ public class MyApp extends Application {
                 .setFlushBulkSize(10)
                 //设置本地缓存最多事件条数，默认为 10000 条
                 .setMaxCacheSize(10000)
+                //设置多少分钟上传一次默认5分钟最大60分钟
+                .setMinutes(20)
                 .initializeDb(this);
 
         Tracker.getInstance().init(this, configuration);
