@@ -27,11 +27,7 @@ public class TrackerDb extends LitePalSupport {
 
     @Override
     public String toString() {
-        return "TrackerDb{" +
-                "type='" + type + '\'' +
-                ", userData='" + userData + '\'' +
-                ", eventTime='" + eventTime + '\'' +
-                '}';
+        return userData;
     }
 
     public String getType() {

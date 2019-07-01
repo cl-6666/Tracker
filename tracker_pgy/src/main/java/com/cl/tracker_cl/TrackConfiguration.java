@@ -35,17 +35,13 @@ public class TrackConfiguration {
      */
     private String serverUrl;
 
-    /**
-     * 上传日志信息的公共参数, URL参数的形式
-     */
-    private String commonParameter;
 
     /**
      * 保存新设备的信息，将需要上传的设备信息以URL参数的形式拼接，如"deviceId=12345&os_version=7.0"
      */
     private String deviceInfo;
 
-    private int mFlushBulkSize = 100;
+    private int mFlushBulkSize = 10;
 
     /**
      * 设置本地缓存最多事件条数，默认为 10000 条
@@ -116,12 +112,6 @@ public class TrackConfiguration {
     }
 
 
-    public TrackConfiguration setCommonParameter(String commonParameter) {
-        this.commonParameter = commonParameter;
-        return this;
-    }
-
-
     public String getConfigUrl() {
         return configUrl;
     }
@@ -139,10 +129,6 @@ public class TrackConfiguration {
 
     public boolean isOpenLog() {
         return openLog;
-    }
-
-    public String getCommonParameter() {
-        return commonParameter;
     }
 
 

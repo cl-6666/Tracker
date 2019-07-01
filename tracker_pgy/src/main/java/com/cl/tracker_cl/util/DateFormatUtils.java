@@ -175,4 +175,16 @@ public class DateFormatUtils {
 
         return false;
     }
+
+
+    public static boolean hasLower(String json) {
+        if (json == null || "".equals(json)) {
+            return false;
+        }
+        if ((json.contains("{") && json.contains("}")) || (json.contains("[") && json.contains("]"))) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
