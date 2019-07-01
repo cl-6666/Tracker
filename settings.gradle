@@ -1,1 +1,1 @@
-include ':app', ':tracker_pgy', ':plugin'
+include ':app', ':tracker_pgy'
