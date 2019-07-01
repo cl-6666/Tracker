@@ -48,8 +48,9 @@
 ```
 
 ### 项目引用  
+```Java
 compile 'com.cl:tracker-sdk:1.0.1'
-
+```
 
 ### 数据上传策略  
 ```Java
@@ -62,22 +63,18 @@ compile 'com.cl:tracker-sdk:1.0.1'
 ```
 ### 初始化操作 
 ```Java
- TrackConfiguration configuration = new TrackConfiguration()
+  TrackConfiguration configuration = new TrackConfiguration()
                 // 开启log
                 .openLog(true)
-                .initializeDb(this)
                 // 设置日志的上传策略
-                .setUploadCategory(UPLOAD_CATEGORY.NEXT_CACHE.getValue())
+                .setUploadCategory(UPLOAD_CATEGORY.REAL_TIME.getValue())
                 // 设置埋点信息上传的URL
                 .setServerUrl(SA_SERVER_URL)
-                //本地缓存的最大事件数目，当累积日志量达到阈值时发送数据，默认值 100
-                .setFlushBulkSize(100)
+                //本地缓存的最大事件数目，当累积日志量达到阈值时发送数据，默认值 10
+                .setFlushBulkSize(10)
                 //设置本地缓存最多事件条数，默认为 10000 条
                 .setMaxCacheSize(10000)
-                // 设置上传埋点信息的公共参数
-                //对于新设备的信息和公共参数，默认提供了包名，渠道，版本号，设备ID，手机品牌，手机系统版本，但在实际开发中，
-                // 需要的参数可能有所差异，所以提供了自定义的功能，只需要将需要的参数以URL参数的格式进行拼接即可。
-                .setCommonParameter("?channel=mi&version=1.0");
+                .initializeDb(this);
         Tracker.getInstance().init(this, configuration);
 ```
 ### 使用方法
