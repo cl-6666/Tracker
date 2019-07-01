@@ -9,37 +9,47 @@
 
 ```Java
 服务器请求数据格式：
+这里只做演示
 {
-    "eventCode":"register_register_button_ck",
-    "deviceId":"CA0AA7D817A33D4E7CFF",
-    "userId":"5882426",
-    "country":"China",
-    "province":"zhejiang",
-    "city":"hangzhou",
-    "appVersion":"100",
-    "networkType":"4G",
-    "wifiName":"wifi123",
-    "screenWidth":1920,
-    "screenHeight":1080,
-    "os":"ios",
-    "osVersion":"811",
-    "browser":"Chrome",
-    "browserVersion":"Chrome 45",
-    "sdk":"ios",
-    "sdkVersion":"811",
-    "manufacturer":"Apple",
-    "model":"iphone8",
-    "project":"test",
-    "channel":"test",
-    "appSource":"huawei",
-    "attributes":{
-        "test2":"dfd",
-        "test":"a123"
-    },
-    "longitude":"1230.90",
-    "latitude":"123,09"
+    "pointList":[
+        {
+            "eventCode":"register_register_button_ck",
+            "deviceId":"CA0AA7D817A33D4E7CFF",
+            "userId":"5882426",
+            "country":"China",
+            "province":"zhejiang",
+            "city":"hangzhou",
+            "appVersion":"100",
+            "networkType":"4G",
+            "wifiName":"wifi123",
+            "screenWidth":1920,
+            "screenHeight":1080,
+            "os":"ios",
+            "osVersion":"811",
+            "browser":"Chrome",
+            "browserVersion":"Chrome 45",
+            "sdk":"ios",
+            "sdkVersion":"811",
+            "manufacturer":"Apple",
+            "model":"iphone8",
+            "project":"test",
+            "channel":"test",
+            "appSource":"huawei",
+            "attributes":{
+                "test2":"dfd",
+                "test":"a123"
+            },
+            "longitude":"1230.90",
+            "latitude":"123,09",
+            "timeMillis":"1561635433687"
+        }
+    ]
 }
 ```
+
+### 项目引用  
+compile 'com.cl:tracker-sdk:1.0.1'
+
 
 ### 数据上传策略  
 ```Java
