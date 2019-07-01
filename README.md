@@ -1,8 +1,56 @@
 # sdk介绍
-### 内部使用第三方库  
-非常轻量级的库  
-https://github.com/alibaba/fastjson  
-https://github.com/LitePalFramework/LitePal  
+### 简单介绍  
+在这里非常感谢神策平台给我带来了灵感编写了这样一个sdk,当然有很多需要完善的部分,我会继续维护下去直到完美，有问题欢迎留言.
+
+### 埋点库里内部自动封装了一些公共参数  
+![公共参数2](http://47.96.120.196/img_point1.png)  
+![公共参数2](http://47.96.120.196/img_point2.png)  
+![公共参数3](http://47.96.120.196/img_point3.png)
+
+```Java
+服务器请求数据格式：
+这里只做演示
+{
+    "pointList":[
+        {
+            "eventCode":"register_register_button_ck",
+            "deviceId":"CA0AA7D817A33D4E7CFF",
+            "userId":"5882426",
+            "country":"China",
+            "province":"zhejiang",
+            "city":"hangzhou",
+            "appVersion":"100",
+            "networkType":"4G",
+            "wifiName":"wifi123",
+            "screenWidth":1920,
+            "screenHeight":1080,
+            "os":"ios",
+            "osVersion":"811",
+            "browser":"Chrome",
+            "browserVersion":"Chrome 45",
+            "sdk":"ios",
+            "sdkVersion":"811",
+            "manufacturer":"Apple",
+            "model":"iphone8",
+            "project":"test",
+            "channel":"test",
+            "appSource":"huawei",
+            "attributes":{
+                "test2":"dfd",
+                "test":"a123"
+            },
+            "longitude":"1230.90",
+            "latitude":"123,09",
+            "timeMillis":"1561635433687"
+        }
+    ]
+}
+```
+
+### 项目引用  
+```Java
+compile 'com.cl:tracker-sdk:1.0.1'
+```
 
 ### 数据上传策略  
 ```Java
@@ -15,22 +63,18 @@ https://github.com/LitePalFramework/LitePal
 ```
 ### 初始化操作 
 ```Java
- TrackConfiguration configuration = new TrackConfiguration()
+  TrackConfiguration configuration = new TrackConfiguration()
                 // 开启log
                 .openLog(true)
-                .initializeDb(this)
                 // 设置日志的上传策略
-                .setUploadCategory(UPLOAD_CATEGORY.NEXT_CACHE.getValue())
+                .setUploadCategory(UPLOAD_CATEGORY.REAL_TIME.getValue())
                 // 设置埋点信息上传的URL
                 .setServerUrl(SA_SERVER_URL)
-                //本地缓存的最大事件数目，当累积日志量达到阈值时发送数据，默认值 100
-                .setFlushBulkSize(100)
+                //本地缓存的最大事件数目，当累积日志量达到阈值时发送数据，默认值 10
+                .setFlushBulkSize(10)
                 //设置本地缓存最多事件条数，默认为 10000 条
                 .setMaxCacheSize(10000)
-                // 设置上传埋点信息的公共参数
-                //对于新设备的信息和公共参数，默认提供了包名，渠道，版本号，设备ID，手机品牌，手机系统版本，但在实际开发中，
-                // 需要的参数可能有所差异，所以提供了自定义的功能，只需要将需要的参数以URL参数的格式进行拼接即可。
-                .setCommonParameter("?channel=mi&version=1.0");
+                .initializeDb(this);
         Tracker.getInstance().init(this, configuration);
 ```
 ### 使用方法
@@ -41,37 +85,41 @@ https://github.com/LitePalFramework/LitePal
  Tracker.getInstance().getDistinctId("");
  上传经纬度
  Tracker.getInstance().setGPSLocation(1323.32, 4232.32);   //测试经纬度
- 点击事件
- Tracker.getInstance().addClickEvent(view);
- 页面事件
- Tracker.getInstance().addViewEvent();
+ 点击事件-页面事件
+ Tracker.getInstance().track("事件名称", json);
+ 需要获取页面标题
+  Tracker.getInstance().getTitle(this).track("事件名称", json);
+ 假如上面的公共参数还不够你项目的需求,没有关系实现：
+  //设置动态公共属性
+        Tracker.getInstance().registerDynamicSuperProperties(new SensorsDataDynamicSuperProperties() {
+            @Override
+            public JSONObject getDynamicSuperProperties() {
+                try {
+                    return new JSONObject().put("isLogin", "测试属性");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+        });
 ```
-### 埋点库里内部自动封装了一些公共参数  
+
+### 可能遇到的问题  
 ```Java
- device_id	string	设备ID（有权限时候直接获取，没有权限获取硬件码生成唯一id，使用uuid）
- network_type	string	例如 WIFI、4G等
- wifi_name
- string	wifi名称（没有的话为空串）
- screen_width	int	屏幕宽度 例如 1080
- screen_height	int	屏幕高度 例如 2160
- os	string	操作系统，例如 ios、android
- os_version	string	操作系统版本，例如 8.1.0
- manufacturer
- string	设备制造商，例如 Xiaomi
- model	string	设备型号，例如 MI MAX 3
- longitude	string	经度
- latitude	string	纬度
- sdk	string	SDK类型，例如android，ios，java，javascript等
- sdk_version	string	SDK版本，例如3.1.5
- app_version	string	应用的版本，1.3.0
- app_name	string	应用的名称
- channel	string	渠道编码
- title	string	页面的标题（以Android为示例 首先读取 activity.getTitle()，如果使用 actionBar，并且 actionBar.getTitle() 不为空，
- screen_name	string	Activity 的包名.类名
- browser	string	浏览器名，例如Chrome
- browser_version	string	浏览器版本，例如Chrome 45
- user_agent	string	浏览器User-Agent字符串，识别客户使用的操作系统及版本、CPU 类型、浏览器及版本、浏览器渲染引擎、浏览器语言、浏览器插件等。
- event_code	string	事件编码
- user_id	string	用户ID（已经登录则传userId，未登录则为空串）
- gmt_time	long	时间，精确到毫秒
+如果说报了如下的错
+java.io.IOException: Cleartext HTTP traffic to t1pvuv.lechuangtec.com not permitted
+为保证用户数据和设备的安全，Google针对下一代 Android 系统(Android P) 的应用程序，将要求默认使用加密连接，这意味着 Android P 将禁止 App 使用所有未加密的连接，因此运行 Android P 系统的安卓设备无论是接收或者发送流量，未来都不能明码传输，需要使用下一代(Transport Layer Security)传输层安全协议。
+也就是说，如果我们的应用是在Android 9或更高版本为目标平台，则默认情况下，是不支持HTTP明文请求的。
+解决方法有很多举例其一
+<?xml version="1.0" encoding="utf-8"?>
+<manifest ...>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <application
+        ...
+        android:usesCleartextTraffic="true"
+        ...>
+        ...
+    </application>
+</manifest>
+
 ```
