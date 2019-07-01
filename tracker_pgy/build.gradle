@@ -1,5 +1,4 @@
 apply plugin: 'com.android.library'
-//apply plugin: 'com.novoda.bintray-release'
 
 
 android {
@@ -22,13 +21,7 @@ android {
         }
     }
 
-
-    //忽略警告
-    lintOptions {
-        abortOnError false
-    }
 }
-
 
 
 dependencies {
