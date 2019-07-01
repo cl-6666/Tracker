@@ -37,7 +37,7 @@ import java.util.TimerTask;
 @Keep
 public class Tracker implements ISensorsDataAPI {
 
-    public static final String SDK_VERSION = "1.0.0";
+    public static final String SDK_VERSION = "1.0.2";
     //全埋点
     private static Map<String, Object> mDeviceInfo;
     private final int UPLOAD_EVENT_WHAT = 1;
@@ -96,12 +96,8 @@ public class Tracker implements ISensorsDataAPI {
      */
     private void uploadStrategy() {
         switch (config.getUploadCategory()) {
-            case NEXT_15_MINUTER:
-                mTimer.schedule(task, 0, 1 * 60 * 1000);
-                break;
-
-            case NEXT_30_MINUTER:
-                mTimer.schedule(task, 0, 30 * 60 * 1000);
+            case TIME_MINUTER:
+                mTimer.schedule(task, 0, config.getMinutes() * 60 * 1000);
                 break;
 
             case NEXT_KNOWN_MINUTER:
@@ -240,8 +236,7 @@ public class Tracker implements ISensorsDataAPI {
                 //存数据库
                 addData(eventName, s, UPLOAD_EVENT_WHAT);
                 break;
-            case NEXT_15_MINUTER:
-            case NEXT_30_MINUTER:
+            case TIME_MINUTER:
             case NEXT_LAUNCH:
                 addData(eventName, s, TIMER_WHAT);
                 break;

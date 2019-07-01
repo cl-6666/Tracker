@@ -44,6 +44,11 @@ public class TrackConfiguration {
     private int mFlushBulkSize = 10;
 
     /**
+     * 按分上传----默认5分钟--最大60分钟
+     */
+    private int mMinutes = 5;
+
+    /**
      * 设置本地缓存最多事件条数，默认为 10000 条
      */
     private int mMaxCacheSize = 10000;
@@ -80,6 +85,15 @@ public class TrackConfiguration {
             mMaxCacheSize = 10000;
         } else {
             mMaxCacheSize = maxCacheSize;
+        }
+        return this;
+    }
+
+    public TrackConfiguration setMinutes(int minutes) {
+        if (minutes > 60) {
+            mMinutes = 60;
+        } else {
+            this.mMinutes = minutes;
         }
         return this;
     }
@@ -149,4 +163,9 @@ public class TrackConfiguration {
     public int getmMaxCacheSize() {
         return mMaxCacheSize;
     }
+
+    public int getMinutes() {
+        return mMinutes;
+    }
+
 }
