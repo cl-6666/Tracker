@@ -49,7 +49,7 @@
 
 ### 项目引用  
 ```Java
-compile 'com.cl:tracker-sdk:1.0.1'
+compile 'com.cl:tracker-sdk:1.0.2'
 ```
 
 ### 数据上传策略  
@@ -63,7 +63,7 @@ compile 'com.cl:tracker-sdk:1.0.1'
 ```
 ### 初始化操作 
 ```Java
-  TrackConfiguration configuration = new TrackConfiguration()
+   TrackConfiguration configuration = new TrackConfiguration()
                 // 开启log
                 .openLog(true)
                 // 设置日志的上传策略
@@ -74,6 +74,8 @@ compile 'com.cl:tracker-sdk:1.0.1'
                 .setFlushBulkSize(10)
                 //设置本地缓存最多事件条数，默认为 10000 条
                 .setMaxCacheSize(10000)
+                //设置多少分钟上传一次默认5分钟最大60分钟
+                .setMinutes(20)
                 .initializeDb(this);
         Tracker.getInstance().init(this, configuration);
 ```
