@@ -28,7 +28,6 @@ android {
         enabled = true
     }
 
-
     //全埋点开关
 //    sensorsAnalytics {
 //        disableAppClick = true
