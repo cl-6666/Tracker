@@ -314,7 +314,7 @@ public class Tracker implements ISensorsDataAPI {
     private void commitRealTimeEvent(String eventName, String s) {
         mTrackerDbs.add(new TrackerDb(eventName, s, String.valueOf(System.currentTimeMillis())));
         String data = "{\"pointList\":" + mTrackerDbs.toString() + "}";
-//        LogUtil.e("实时上传数据：" + data);
+        LogUtil.e("实时上传数据：" + data);
         PgyHttp.sendJsonRequest(data, config.getServerUrl(), BaseBean.class, new IDataListener<BaseBean>() {
             @Override
             public void onSuccess(BaseBean student) {
@@ -338,7 +338,7 @@ public class Tracker implements ISensorsDataAPI {
         LogUtil.e("URL:" + config.getServerUrl());
         //拼接一下即可
         String data = "{\"pointList\":" + allSongs.toString() + "}";
-//        LogUtil.e("数据:" + data);
+        LogUtil.e("缓存上传的数据:" + data);
         PgyHttp.sendJsonRequest(data, config.getServerUrl(), BaseBean.class, new IDataListener<BaseBean>() {
             @Override
             public void onSuccess(BaseBean student) {
