@@ -54,12 +54,11 @@ compile 'com.cl:tracker-sdk:1.0.2'
 
 ### 数据上传策略  
 ```Java
-   REAL_TIME(0),           // 实时传输，用于收集配置信息
-    NEXT_LAUNCH(-1),        // 下次启动时上传
-    NEXT_15_MINUTER(15),    // 每15分钟上传一次
-    NEXT_30_MINUTER(30),    // 每30分钟上传一次
-    NEXT_CACHE(1),       // 使用本地缓存策略
-    NEXT_KNOWN_MINUTER(-1); // 使用服务器下发的上传策略
+  REAL_TIME(0),           // 实时传输，用于收集配置信息
+  NEXT_LAUNCH(-1),        // 下次启动时上传
+  TIME_MINUTER(2),    // 按分钟上传
+  NEXT_CACHE(1),       // 使用本地缓存策略
+  NEXT_KNOWN_MINUTER(-1); // 使用服务器下发的上传策略
 ```
 ### 初始化操作 
 ```Java
@@ -125,3 +124,7 @@ java.io.IOException: Cleartext HTTP traffic to t1pvuv.lechuangtec.com not permit
 </manifest>
 
 ```
+
+### 博客地址  
+https://blog.csdn.net/a214024475/article/details/94436562
+
