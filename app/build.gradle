@@ -1,5 +1,5 @@
 apply plugin: 'com.android.application'
-//apply plugin: 'com.cl.android'
+apply plugin: "com.cl.android"
 
 android {
 
@@ -27,11 +27,6 @@ android {
     dataBinding {
         enabled = true
     }
-
-    //全埋点开关
-//    sensorsAnalytics {
-//        disableAppClick = true
-//    }
 }
 
 
