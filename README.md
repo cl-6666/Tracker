@@ -50,6 +50,23 @@
 ### 项目引用  
 ```Java
 compile 'com.cl:tracker-sdk:1.0.2'
+
+需要全埋点请添加
+buildscript {
+  repositories {
+    maven {
+      url "https://plugins.gradle.org/m2/"
+    }
+  }
+  dependencies {
+    classpath "gradle.plugin.com.trackerBuriedSdk.gradlePlugin:plugin:1.0.0"
+  }
+}
+在你的build.gradle引用
+apply plugin: "com.cl.android"
+
+关闭埋点开关在gradle.properties里面声明
+sensorsAnalytics.disablePlugin=true
 ```
 
 ### 数据上传策略  
